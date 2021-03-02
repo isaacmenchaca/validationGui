@@ -26,9 +26,6 @@ $( document ).ready(function() {
         }, 0);
       }
     ); // jquery selector
-
-
-
 });
 
 
@@ -45,8 +42,21 @@ async function onClickQuadrantSplitButton(type){
   $('.textQuadrantSplitType').html(type)
 }
 
+async function getFolder() {
+var path = await eel.pythonGoButtonClicked()();
+	if (path) { // if something returns, then print out the path.
+		console.log(path);
+	}
+}
+
 async function onClickGoButton(){
-  console.log("GO!")
+  // console.log("GO!")
+  // var path = await eel.pythonGoButtonClicked()();
+  //  if (path) { // if something returns, then print out the path.
+  //    console.log(path);
+  //  }
+
+ console.log($('#inputGroupFile02').val());
 }
 
 
