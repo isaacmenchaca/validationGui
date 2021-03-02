@@ -29,36 +29,46 @@ $( document ).ready(function() {
 });
 
 
+var textValidationType;
+var textPlateType
+var textQuadrantSplitType;
+var filePath;
 
-async function onClickValidationTypeButton(type){
-  $('.textValidationType').append("<span/>").html(type)
+
+async function onClickValidationTypeButton(value){
+  $('.textValidationType').append("<span/>").html(value);
+  textValidationType = value;
 }
 
-async function onClickPlateTypeButton(type){
-  $('.textPlateType').html(type)
+async function onClickPlateTypeButton(value){
+  $('.textPlateType').html(value);
+  textPlateType = value;
 }
 
-async function onClickQuadrantSplitButton(type){
-  $('.textQuadrantSplitType').html(type)
+async function onClickQuadrantSplitButton(value){
+  $('.textQuadrantSplitType').html(value);
+  textQuadrantSplitType = value;
 }
 
-async function getFolder() {
-var path = await eel.pythonGoButtonClicked()();
-	if (path) { // if something returns, then print out the path.
-		console.log(path);
-	}
+async function onClickChooseFileButton(){
+  // console.log("GO!")
+  var path = await eel.pythonGoButtonClicked()();
+   if (path) {
+     // console.log(path);
+     $(".fileTextBox").val(path)
+     filePath = path
+   }
 }
 
 async function onClickGoButton(){
-  // console.log("GO!")
-  // var path = await eel.pythonGoButtonClicked()();
-  //  if (path) { // if something returns, then print out the path.
-  //    console.log(path);
-  //  }
-
- console.log($('#inputGroupFile02').val());
+  // send data
+  console.log(filePath);
+  console.log(textValidationType);
+  console.log(textPlateType);
+  console.log(textQuadrantSplitType);
+  // do something if one of the values are undefined.
+  await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)
 }
-
 
 function addDropButtons(){
   // console.log('FIXME: add dropdown buttons')
@@ -66,7 +76,8 @@ function addDropButtons(){
                     .append($("<div/>").addClass("col-12")
                             .append($("<div/>").addClass("input-group mb-3").attr({"style": "display:table; text-align: center;"})
                                     .append($("<div/>").addClass("custom-file")
-                                            .append($("<input/>").addClass("custom-file-input").attr({"type": "file", "id": "inputGroupFile02", "style": "border: 1px solid black; border-radius: 5px;"}))
+                                            .append($("<button/>").addClass("btn btn-outline-dark").attr({"type": "button", "id": "inputGroupFile02"}).html("Choose File").click(function(){onClickChooseFileButton()}))
+                                            .append($("<input/>").addClass("fileTextBox").attr({"disabled": true}))
                                           )
                                   )
                            )

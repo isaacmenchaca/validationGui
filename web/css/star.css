@@ -196,6 +196,19 @@ padding-top: 5px;
   height: 20px;
 }
 
+.custom-file-input{
+	border: 1px solid black;
+	border-radius: 5px;
+}
+
+.fileTextBox{
+	border: 2px solid black;
+	color: black;
+  margin-left: 1px;
+  border-radius: 2px;
+  height: 34px;
+	width: 250px;
+}
 
 /* .goButton{
 	padding-left: 200px;
