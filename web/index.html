@@ -9,10 +9,9 @@
      <link rel="stylesheet" type="text/css" href="./css/star.css">
      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
 </head>
-
 <body>
   <div class = "container-fluid" style = "padding: 0;">
-  <div class="sky">
+    <div class="sky">
         <div class="starts">
           <div class="small-stars">
             <span class="star"><i></i></span>
@@ -114,11 +113,32 @@
           </div>
 
           <div class = "hud">
+            <!-- Button trigger modal -->
+            <div id="inputMapModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Accuracy Plate Map</h5>
+                  </div>
+                  <div id="modalText" class="modal-body">
+                    <!-- Create a div where the graph will take place -->
+                      <div id="inputPlate"></div>
+                  </div>
+                  <div class="modal-footer">
+                    <!-- <button type="plateMapSubmit button" class="reload btn btn-primary">Submit</button> -->
+                  </div>
+                </div>
+              </div>
+          </div>
+<!--  -->
+
           </div>
         </div>
 
 
 		</div>
+
+
   </div>
 
 
@@ -139,11 +159,11 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
   <script src="./js/animationValidationHandler.js"></script>
 
-  <script>
+  <!-- <script>
     function callPythonFunction(){
       eel.pythonPrintsValue(2, 3)
       }
-    </script>
+    </script> -->
 
 
 </body>

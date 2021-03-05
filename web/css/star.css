@@ -210,6 +210,15 @@ padding-top: 5px;
 	width: 250px;
 }
 
+#inputMapModal .modal-dialog{
+	max-width: 65%;
+}
+
+.axis {
+	font: 15px sans-serif;
+}
+
+
 /* .goButton{
 	padding-left: 200px;
 } */

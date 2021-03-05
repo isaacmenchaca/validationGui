@@ -1,11 +1,10 @@
 import eel
 import tkinter as tk
 from tkinter import filedialog
+from uniformityValidationMethod import uniformityValidationMethod
 # Set web files folder and optionally specify which file types to check for eel.expose()
 #   *Default allowed_extensions are: ['.js', '.html', '.txt', '.htm', '.xhtml']
 eel.init('web')
-
-
 
 @eel.expose
 def pythonGoButtonClicked():
@@ -16,7 +15,7 @@ def pythonGoButtonClicked():
     return filePath
 
 @eel.expose
-def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath):
+def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath, inputInfo = None):
     print(textValidationType, textPlateType, textQuadrantSplitType, filePath)
 
     if textValidationType == 'Accuracy':
@@ -31,9 +30,13 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
     elif textValidationType == 'Uniformity':
         if textPlateType == 96:
             print('FIXME: Run python Uniformity 96 method')
+            uniformityValidationMethod(file = filePath, input384 = False).to_excel('TESTONGUI')
         elif textPlateType == 384:
             if textQuadrantSplitType == "No":
                 print('FIXME: Run python Uniformity 384 method')
+                uniformJson = uniformityValidationMethod(file = filePath, input384=True).to_json()
+
+                return uniformJson # delete right after
             elif textQuadrantSplitType == "Yes":
                 print('FIXME: Run python Uniformity 384 method with Quadrants split')
 
@@ -46,7 +49,7 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
             elif textQuadrantSplitType == "Yes":
                 print('FIXME: Run python Checkerboard 384 method with Quadrants split')
 
-    print('/n')
+    
     return
 
 
