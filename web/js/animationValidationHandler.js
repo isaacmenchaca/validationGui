@@ -16,6 +16,8 @@ var textPlateType
 var textQuadrantSplitType;
 var filePath;
 var mapInput;
+var controlAndNaNWells = ["A1", "B1", "C1", "D1", "E11", "F11", "G11", "H11",
+                        "A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"];
 
 
 function initialPlateMap(){
@@ -72,6 +74,7 @@ function initialPlateMap(){
   for(var columnCount=0; columnCount<12; columnCount++){
     for(var rowCount=0; rowCount<8; rowCount++){
       var idWell = rows[rowCount] + columns[columnCount]
+      if (!controlAndNaNWells.includes(idWell)){
       d3.select("#inGrid")
             .append("rect").on("click", function(){changeWellColor($(this).attr("id"))})
             .attr("x", function() { return x(columns[columnCount]) }) // x(columns[columnCount]). inputting columns[columnCount] into var x which is a built in function of d3.
@@ -84,9 +87,22 @@ function initialPlateMap(){
             .attr("width", x.bandwidth() ) // bandwidth is a d3 function where it automatically centers axis with cell.
             .attr("height", y.bandwidth() ) // the length of size (170px) variable divided by domain (ex 8 rows).
             .attr("style","fill:white;stroke:black;stroke-width:2")
+          }
+      else{
+        d3.select("#inGrid")
+              .append("rect")//.on("click", function(){changeWellColor($(this).attr("id"))})
+              .attr("x", function() { return x(columns[columnCount]) }) // x(columns[columnCount]). inputting columns[columnCount] into var x which is a built in function of d3.
+              // var x is now being sliced by columns[columnCount] with this function x.
+              // "x" is a css attribute.
+              .attr("y", function() { return y(rows[rowCount]) })
+              // var y is now being sliced by columns[columnCount] with this function y.
+              // "y" is a css attribute.
+              .attr("id", idWell)
+              .attr("width", x.bandwidth() ) // bandwidth is a d3 function where it automatically centers axis with cell.
+              .attr("height", y.bandwidth() ) // the length of size (170px) variable divided by domain (ex 8 rows).
+              .attr("style","fill:grey;stroke:black;stroke-width:2")
+      }
     }
-
-
   }
 }
 
@@ -128,32 +144,38 @@ function compareMapButton(){
   var cps2000Count = 0
   var cps20000Count = 0
   var plateMapColorArray = new Array(96);
+
   $("rect").each( function( index, element ){
      // console.log(index, $(element));
      // d3.select("#" + wellPosID).style('fill')
-
-
      concentrationOfSpike = d3.select("#" + $(element).attr("id")).style('fill');
-
-     if (concentrationOfSpike == "white"){
-       plateMapColorArray[index] = "neg";
-       negCount += 1;
+     if(!controlAndNaNWells.includes($(element).attr("id"))){
+       if (concentrationOfSpike == "white"){
+         plateMapColorArray[index] = "neg";
+         negCount += 1;
+       }
+       else if (concentrationOfSpike == "black"){
+         plateMapColorArray[index] = 100;
+         cps100Count += 1;
+       }
+       else if (concentrationOfSpike == "red"){
+         plateMapColorArray[index] = 200;
+         cps200Count += 1;
+       }
+       else if (concentrationOfSpike == "blue"){
+         plateMapColorArray[index] = 2000;
+         cps2000Count += 1;
+       }
+       else if (concentrationOfSpike == "green"){
+         plateMapColorArray[index] = 20000;
+         cps20000Count += 1;
+       }
      }
-     else if (concentrationOfSpike == "black"){
-       plateMapColorArray[index] = 100;
-       cps100Count += 1;
+     else if(index < 4){
+       plateMapColorArray[index] = "control";
      }
-     else if (concentrationOfSpike == "red"){
-       plateMapColorArray[index] = 200;
-       cps200Count += 1;
-     }
-     else if (concentrationOfSpike == "blue"){
-       plateMapColorArray[index] = 2000;
-       cps2000Count += 1;
-     }
-     else if (concentrationOfSpike == "green"){
-       plateMapColorArray[index] = 20000;
-       cps20000Count += 1;
+     else{
+       plateMapColorArray[index] = "N/A";
      }
   });
 
