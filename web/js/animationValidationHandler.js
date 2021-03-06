@@ -10,6 +10,7 @@ $( document ).ready(function() {
     );
 });
 
+//---------------------------------------------------------------------------------------------------
 //  functional methods here:
 var textValidationType;
 var textPlateType
@@ -19,7 +20,7 @@ var mapInput;
 var controlAndNaNWells = ["A1", "B1", "C1", "D1", "E11", "F11", "G11", "H11",
                         "A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"];
 
-
+//---------------------------------------------------------------------------------------------------
 function initialPlateMap(){
   // Deletes previous plate if exist
   d3.select("#inputPlate").selectAll('svg').remove();
@@ -39,6 +40,7 @@ function initialPlateMap(){
                 .append("g")
                 .attr("id", "inGrid")
                 .attr("transform", "translate("+margin.left+","+margin.top+")");
+
 
   // you have to have an x and y variable for array/ matrices.
   // Build X scales and axis:
@@ -69,7 +71,6 @@ function initialPlateMap(){
             .attr("class", "axis");
 
   //Read the data
-
 
   for(var columnCount=0; columnCount<12; columnCount++){
     for(var rowCount=0; rowCount<8; rowCount++){
@@ -106,7 +107,7 @@ function initialPlateMap(){
   }
 }
 
-
+//---------------------------------------------------------------------------------------------------
 function changeWellColor(wellPosID, rowCount, columnCount){
               // console.log(wellPos)
               // console.log(wellPosID)
@@ -130,7 +131,8 @@ function changeWellColor(wellPosID, rowCount, columnCount){
               }
 }
 
-function compareMapButton(){
+//---------------------------------------------------------------------------------------------------
+async function compareMapButton(){
   var rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
   var columns = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
 
@@ -181,6 +183,8 @@ function compareMapButton(){
 
   if (negCount == 30 && cps100Count == 20 && cps200Count == 20 && cps2000Count == 5 && cps20000Count == 5){
     console.log("Pass that data.", negCount, cps100Count, cps200Count, cps2000Count, cps20000Count)
+    jsonReturnFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath, plateMapColorArray)()
+    $('#inputMapModal').modal("hide")
   }
   else{
     console.log("Dont pass that data.", negCount, cps100Count, cps200Count, cps2000Count, cps20000Count)
@@ -189,11 +193,13 @@ function compareMapButton(){
 }
 
 
+//---------------------------------------------------------------------------------------------------
 async function onClickValidationTypeButton(value){
   $('.textValidationType').append("<span/>").html(value);
   textValidationType = value;
 }
 
+//---------------------------------------------------------------------------------------------------
 async function onClickPlateTypeButton(value){
   $('.textPlateType').html(value);
   textPlateType = value;
@@ -211,11 +217,13 @@ async function onClickPlateTypeButton(value){
 
 }
 
+//---------------------------------------------------------------------------------------------------
 async function onClickQuadrantSplitButton(value){
   $('.textQuadrantSplitType').html(value);
   textQuadrantSplitType = value;
 }
 
+//---------------------------------------------------------------------------------------------------
 async function onClickChooseFileButton(){
   // console.log("GO!")
   var path = await eel.pythonGoButtonClicked()();
@@ -226,11 +234,12 @@ async function onClickChooseFileButton(){
    }
 }
 
+//---------------------------------------------------------------------------------------------------
 async function onClickGoButton(){
   if (filePath != null &&  textValidationType != null && textPlateType != null && textQuadrantSplitType != null){
     // your code here.
     // send data
-    var jsonReturn;
+    var jsonReturnFromPython;
     console.log(filePath);
     console.log(textValidationType);
     console.log(textPlateType);
@@ -245,11 +254,11 @@ async function onClickGoButton(){
       $('.modal-footer').append($("<button/>").addClass("btn btn-primary").attr({"type": "button", "id": "plateMapSubmit"}).html("Submit").click(function(){compareMapButton()}))
 
       // obtain value of modal pop up to mapInput and then push the variable into a function.
-      jsonReturn = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)()
+      //jsonReturnFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)()
     }
     else{
-      jsonReturn = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)()
-      console.log(jsonReturn)
+      jsonReturnFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)()
+      console.log(jsonReturnFromPython)
     }
   }
 
@@ -258,6 +267,7 @@ async function onClickGoButton(){
     console.log('nothing input')
   }
 }
+//---------------------------------------------------------------------------------------------------
 
 function addDropButtons(){
   // console.log('FIXME: add dropdown buttons')
