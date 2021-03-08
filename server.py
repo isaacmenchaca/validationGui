@@ -1,4 +1,4 @@
-import eel
+import eel, json
 import tkinter as tk
 from tkinter import filedialog
 import numpy as np
@@ -28,9 +28,12 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
             print('FIXME: Run python Accuracy 96 method')
             # print(np.resize(np.array(inputInfo), [12, 8]).T)
             mapAcc = javascriptAccuracyMap2Dataframe(np.resize(np.array(inputInfo), [12, 8]).T)
+            SARSdf, outputDf = accuracyValidationMethod_96(mapAcc, file = filePath)
+
             print(mapAcc)
-            print(accuracyValidationMethod_96(mapAcc, file = filePath))
-            return 1
+            print(outputDf)
+            # return json.dumps(json.loads(SARSdf.to_json()))
+            return SARSdf.to_json()
         elif textPlateType == 384:
             if textQuadrantSplitType == "No":
                 print('FIXME: Run python Accuracy 384 method')

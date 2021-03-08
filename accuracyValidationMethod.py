@@ -81,7 +81,7 @@ def mapValidation(mapAcc):
     assert num_200 == 20, 'There is an invalid number of 200 cps in Accuracy Mapping.'
     assert num_2000 == 5, 'There is an invalid number of 2000 cps in Accuracy Mapping.'
     assert num_20000 == 5, 'There is an invalid number of 20000 cps in Accuracy Mapping.'
-    
+
     return
 
 def formatAccuracyReport(mapAcc, FAMdf, REDdf):
@@ -294,7 +294,7 @@ def accuracyValidationMethod_96(mapAcc, file: str):
 
     accuracy_report = formatAccuracyReport(mapAcc, FAMdf, REDdf) # helper method
 
-    return accuracy_report.fillna('N/A')
+    return FAMdf, accuracy_report.fillna('N/A')
 
 def accuracyValidationMethod_384(accuracyMap_Quad1: str,
                                 accuracyMap_Quad2: str,

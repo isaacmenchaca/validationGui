@@ -183,15 +183,95 @@ async function compareMapButton(){
 
   if (negCount == 30 && cps100Count == 20 && cps200Count == 20 && cps2000Count == 5 && cps20000Count == 5){
     console.log("Pass that data.", negCount, cps100Count, cps200Count, cps2000Count, cps20000Count)
-    jsonReturnFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath, plateMapColorArray)()
+    let sarsDfFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath, plateMapColorArray)();
+    let sarsDfasObj = JSON.parse(sarsDfFromPython);
+
+    console.log(sarsDfFromPython) // returns JSON in string
+    console.log(typeof sarsDfFromPython)
+
+
+    if (!jQuery.isEmptyObject(sarsDfasObj)){
+      console.log(sarsDfasObj)
+      makeOutputHeatMap()
+      // console.log(typeof asObj)
+    }
+
+
     $('#inputMapModal').modal("hide")
   }
   else{
     console.log("Dont pass that data.", negCount, cps100Count, cps200Count, cps2000Count, cps20000Count)
   }
-  console.log(plateMapColorArray)
+  // console.log(plateMapColorArray)
 }
 
+//---------------------------------------------------------------------------------------------------
+function makeOutputHeatMap(sarsDfasObj){
+  console.log("Fixme: Ouptut heatmap")
+  //   let rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
+  //   let columns = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+  //   let margin = {top: 30, right: 30, bottom: 30, left: 30};
+  //   let width = (125 * 5) - margin.left - margin.right;
+  //   let height = (82 * 5) - margin.top - margin.bottom;
+  //
+  //   let svg = d3.select(".heatMap")
+  // .append("svg")
+  //   .attr("width", width + margin.left + margin.right)
+  //   .attr("height", height + margin.top + margin.bottom)
+  // .append("g")
+  //   .attr("transform",
+  //         "translate(" + margin.left + "," + margin.top + ")");
+  //
+  //
+  //         // you have to have an x and y variable for array/ matrices.
+  //         // Build X scales and axis:
+  //         let x = d3.scaleBand() // just a scale
+  //                     .domain(columns) // represents matrix location
+  //                     .range([0, width])
+  //                     .padding(0.01)
+  //
+  //
+  //         // Build Y scales and axis:
+  //         let y = d3.scaleBand() // just a scale
+  //                     .domain(rows) // domain is 8, represents matrix location
+  //                     .range([0, height]) // divides domain up by this much?
+  //                     .padding(0.01)
+  //
+  //         // SVG generate X axis
+  //         // svg.append("g").attr("transform", "translate(0,"+height+")").call(d3.axisBottom(x));
+  //         svg.append("g")
+  //                   .attr("transform", "translate(0, -2)") // this was for the distance between the axis line
+  //                   .call(d3.axisTop(x).tickSize([0, 0]))
+  //                   .call(g => g.select(".domain").remove()) // to remove the ticks (lines of the ticks)
+  //                   .attr("class", "axis");
+  //         // SVG generate Y axis
+  //         svg.append("g")
+  //                   .attr("transform", "translate(-2, 0)")
+  //                   .call(d3.axisLeft(y).tickSize([0, 0]))
+  //                   .call(g => g.select(".domain").remove())
+  //                   .attr("class", "axis");
+  //
+  //                   // Build color scale
+  //         let myColor = d3.scaleLinear()
+  //           .range(["white", "red"])
+  //           .domain([1,100])
+  //
+  //       d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/heatmap_data.csv", function(data) {
+  //
+  //           svg.selectAll()
+  //               .data(data, function(d) {return d.group+':'+d.variable;})
+  //               .enter()
+  //               .append("rect")
+  //               .attr("x", function(d) { return x(d.group) })
+  //               .attr("y", function(d) { return y(d.variable) })
+  //               .attr("width", x.bandwidth() )
+  //               .attr("height", y.bandwidth() )
+  //               .style("fill", function(d) { return myColor(d.value)} )
+  //
+  //         })
+
+
+}
 
 //---------------------------------------------------------------------------------------------------
 async function onClickValidationTypeButton(value){
@@ -251,12 +331,17 @@ async function onClickGoButton(){
       $('#inputMapModal').modal("show")
       // <button type="plateMapSubmit button" class="reload btn btn-primary">Submit</button>
       initialPlateMap()
-      $('.modal-footer').append($("<button/>").addClass("btn btn-primary").attr({"type": "button", "id": "plateMapSubmit"}).html("Submit").click(function(){compareMapButton()}))
+      $('#plateMapSubmit').click(function(){compareMapButton()})
+
+      // $('.modal-footer').append($("<button/>").addClass("btn btn-primary").attr({"type": "button", "id": "plateMapSubmit"}).html("Submit").click(function(){compareMapButton()})
+
+
 
       // obtain value of modal pop up to mapInput and then push the variable into a function.
       //jsonReturnFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)()
     }
     else{
+      console.log("else stuff activated")
       jsonReturnFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)()
       console.log(jsonReturnFromPython)
     }
@@ -281,8 +366,8 @@ function addDropButtons(){
                                   )
                            )
                   )
-
-  $('.hud').append($("<div/>").addClass("dropDownRow row").attr({"style": "padding-top: 0px"})
+// <div id="my_dataviz"></div>
+          .append($("<div/>").addClass("dropDownRow row").attr({"style": "padding-top: 0px"})
                           .append($("<div/>").addClass("col-3").attr({"style": "text-align: center;"})
                                   .append($("<div/>").addClass("btn-group")
                                           .append($("<button/>").addClass("btn btn-primary dropdown-toggle animate__animated animate__fadeInUp").attr({'data-toggle': "dropdown", "aria-haspopup": "true", "aria-expanded": "false"}).html("Validation Type"))
@@ -324,11 +409,14 @@ function addDropButtons(){
                                 )
 
                         )
+
               .append($("<div/>").addClass("textRow row").attr({"style": "padding-top: 0px"})
                                   .append($("<div/>").addClass("textValidationType col-3").attr({"style": "text-align: center;"}))
                                   .append($("<div/>").addClass("textPlateType col-3").attr({"style": "text-align: center;"}))
                                   .append($("<div/>").addClass("textQuadrantSplitType col-3").attr({"style": "text-align: center;"}))
                       )
+
+              .append($("<div/>").addClass("heatMap"))
 
 
 }
