@@ -17,6 +17,7 @@ body {
 }
 
 
+
 /*=== Small stars ======*/
 .small-stars {
 	width: 100%;
@@ -219,12 +220,6 @@ padding-top: 5px;
 }
 
 
-/* .goButton{
-	padding-left: 200px;
-} */
-
-/* make this part dynamic!!!! */
-
 .hud {
     animation-name: hud;
     animation-duration: 1500ms;
@@ -239,13 +234,28 @@ padding-top: 5px;
     border-radius: 10px;
 }
 
-.heatMap{
-	height: 500px;
-	padding-top: 20px;
-	border: 2px solid black;
-	/* rgba(255, 255, 255, 0.5); */
-	border-radius: 10px;
+#heatMapSvg {
+	display: block;
+	margin: auto;
 }
+
+#inGridSvg {
+	display: block;
+	margin: auto;
+}
+
+#MapCarouselIndicators{
+	height: 350px;
+}
+
+
+
+
+
+
+
+
+
 
 /*============ Animations ============*/
 @-webkit-keyframes blink {

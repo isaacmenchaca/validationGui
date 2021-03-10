@@ -35,6 +35,7 @@ function initialPlateMap(){
   // SVG template
   var svg = d3.select("#inputPlate")
                 .append("svg")
+                .attr("id", "inGridSvg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
                 .append("g")
@@ -192,7 +193,7 @@ async function compareMapButton(){
 
     if (!jQuery.isEmptyObject(sarsDfasObj)){
       console.log(sarsDfasObj)
-      makeOutputHeatMap()
+      makeOutputHeatMap(sarsDfasObj)
       // console.log(typeof asObj)
     }
 
@@ -207,69 +208,84 @@ async function compareMapButton(){
 
 //---------------------------------------------------------------------------------------------------
 function makeOutputHeatMap(sarsDfasObj){
-  console.log("Fixme: Ouptut heatmap")
-  //   let rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
-  //   let columns = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
-  //   let margin = {top: 30, right: 30, bottom: 30, left: 30};
-  //   let width = (125 * 5) - margin.left - margin.right;
-  //   let height = (82 * 5) - margin.top - margin.bottom;
-  //
-  //   let svg = d3.select(".heatMap")
-  // .append("svg")
-  //   .attr("width", width + margin.left + margin.right)
-  //   .attr("height", height + margin.top + margin.bottom)
-  // .append("g")
-  //   .attr("transform",
-  //         "translate(" + margin.left + "," + margin.top + ")");
-  //
-  //
-  //         // you have to have an x and y variable for array/ matrices.
-  //         // Build X scales and axis:
-  //         let x = d3.scaleBand() // just a scale
-  //                     .domain(columns) // represents matrix location
-  //                     .range([0, width])
-  //                     .padding(0.01)
-  //
-  //
-  //         // Build Y scales and axis:
-  //         let y = d3.scaleBand() // just a scale
-  //                     .domain(rows) // domain is 8, represents matrix location
-  //                     .range([0, height]) // divides domain up by this much?
-  //                     .padding(0.01)
-  //
-  //         // SVG generate X axis
-  //         // svg.append("g").attr("transform", "translate(0,"+height+")").call(d3.axisBottom(x));
-  //         svg.append("g")
-  //                   .attr("transform", "translate(0, -2)") // this was for the distance between the axis line
-  //                   .call(d3.axisTop(x).tickSize([0, 0]))
-  //                   .call(g => g.select(".domain").remove()) // to remove the ticks (lines of the ticks)
-  //                   .attr("class", "axis");
-  //         // SVG generate Y axis
-  //         svg.append("g")
-  //                   .attr("transform", "translate(-2, 0)")
-  //                   .call(d3.axisLeft(y).tickSize([0, 0]))
-  //                   .call(g => g.select(".domain").remove())
-  //                   .attr("class", "axis");
-  //
-  //                   // Build color scale
-  //         let myColor = d3.scaleLinear()
-  //           .range(["white", "red"])
-  //           .domain([1,100])
-  //
-  //       d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/heatmap_data.csv", function(data) {
-  //
-  //           svg.selectAll()
-  //               .data(data, function(d) {return d.group+':'+d.variable;})
-  //               .enter()
-  //               .append("rect")
-  //               .attr("x", function(d) { return x(d.group) })
-  //               .attr("y", function(d) { return y(d.variable) })
-  //               .attr("width", x.bandwidth() )
-  //               .attr("height", y.bandwidth() )
-  //               .style("fill", function(d) { return myColor(d.value)} )
-  //
-  //         })
 
+
+    let rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
+    let columns = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+    let margin = {top: 30, right: 30, bottom: 30, left: 30};
+    let width = (125 * 5) - margin.left - margin.right;
+    let height = (82 * 5) - margin.top - margin.bottom;
+
+    let svg = d3.select(".sarsDivPlacement")
+            .append("svg")
+            .attr("id", "heatMapSvg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("id", "heatMapGrid")
+            .attr("transform",
+              "translate(" + margin.left + "," + margin.top + ")");
+
+
+          // you have to have an x and y variable for array/ matrices.
+          // Build X scales and axis:
+          let x = d3.scaleBand() // just a scale
+                      .domain(columns) // represents matrix location
+                      .range([0, width])
+                      .padding(0.01)
+
+
+          // Build Y scales and axis:
+          let y = d3.scaleBand() // just a scale
+                      .domain(rows) // domain is 8, represents matrix location
+                      .range([0, height]) // divides domain up by this much?
+                      .padding(0.01)
+
+
+          // SVG generate X axis
+          // svg.append("g").attr("transform", "translate(0,"+height+")").call(d3.axisBottom(x));
+          svg.append("g")
+                    .attr("transform", "translate(0, -2)") // this was for the distance between the axis line
+                    .call(d3.axisTop(x).tickSize([0, 0]))
+                    .call(g => g.select(".domain").remove()) // to remove the ticks (lines of the ticks)
+                    .attr("class", "axis");
+          // SVG generate Y axis
+          svg.append("g")
+                    .attr("transform", "translate(-2, 0)")
+                    .call(d3.axisLeft(y).tickSize([0, 0]))
+                    .call(g => g.select(".domain").remove())
+                    .attr("class", "axis");
+
+          // Build color scale
+          let heatColor = d3.scaleLinear()
+            .range(["red", "white"])
+            .domain([45, 20])
+
+            //Read the data
+                for (var columnCount = 1; columnCount <= 12; columnCount++) {
+                  for (var rowCount = 0; rowCount < 8; rowCount++) {
+                    d3.select("#heatMapGrid").selectAll()
+                      .data([sarsDfasObj])
+                      .enter()
+                      .append("rect")
+                      .attr("x", function() {
+                        return x(columnCount)
+                      })
+                      .attr("y", function(d) {
+                        return y(rows[rowCount])
+                      })
+                      .attr("width", x.bandwidth())
+                      .attr("height", y.bandwidth())
+                      .attr("style", "stroke:black;stroke-width:2")
+                      .style("fill", function(d) {
+                        if (d[columnCount][rows[rowCount]] >= 40) {
+                          return heatColor(null)
+                        } else {
+                          return heatColor(d[columnCount][rows[rowCount]])
+                        }
+                      })
+                  }
+            }
 
 }
 
@@ -415,8 +431,67 @@ function addDropButtons(){
                                   .append($("<div/>").addClass("textPlateType col-3").attr({"style": "text-align: center;"}))
                                   .append($("<div/>").addClass("textQuadrantSplitType col-3").attr({"style": "text-align: center;"}))
                       )
+ // ----------------- ADD CAROUSEL HEREEE
+              .append($("<div/>").addClass("carousel slide").attr({"id": "MapCarouselIndicators", "data-ride":"carousel"})
+                                .append($("<ol/>").addClass("carousel-indicators")
+                                                  .append($("<li/>").addClass("active").attr({"data-target":"MapCarouselIndicators", "data-slide-to": "0"}))
+                                                  .append($("<li/>").attr({"data-target":"MapCarouselIndicators", "data-slide-to": "1"}))
+                                       )
+                                .append($("<div/>").addClass("carousel-inner")
+                                                   .append($("<div/>").addClass("carousel-item active sarsDivPlacement"))
+                                                   .append($("<div/>").addClass("carousel-item calRedDivPlacement"))
+                                // <div class="carousel-item active">
+                                //       <img class="d-block w-100" src="..." alt="First slide">
+                                //     </div>
+                                       )
+                                .append($("<a/>").addClass("carousel-control-prev").attr({"href":"#MapCarouselIndicators", "role":"button", "data-slide":"prev"})
+                                                 .append($("<span/>").addClass("carousel-control-prev-icon").attr({"aria-hidden": "true"}))
+                                                 // .append($("<span/>").addClass("sr-only"))
+                                      )
+                                .append($("<a/>").addClass("carousel-control-next").attr({"href":"#MapCarouselIndicators", "role":"button", "data-slide":"next"})
+                                                  .append($("<span/>").addClass("carousel-control-next-icon").attr({"aria-hidden": "true"}))
+                                                  // .append($("<span/>").addClass("sr-only"))
+                                      )
+                      )
 
-              .append($("<div/>").addClass("heatMap"))
 
+                      // <div id="MapCarouselIndicators" class="carousel slide" data-ride="carousel">
+                      //      <ol class="carousel-indicators">
+                      //        <li data-target="#MapCarouselIndicators" data-slide-to="0" class="active"></li>
+                      //        <li data-target="#MapCarouselIndicators" data-slide-to="1"></li>
+                      //      </ol>
+                      //      <div class="carousel-inner">
+                      //        <div class="carousel-item active sarsDivPlacement">
+                      //           <!-- <img class="d-block w-100" src="..." alt="First slide"> -->
+                      //       </div>
+                      //     </div>
+                      // </div>
+
+              // <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+              //   <ol class="carousel-indicators">
+              //     <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+              //     <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+              //     <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+              //   </ol>
+              //   <div class="carousel-inner">
+              //     <div class="carousel-item active">
+              //       <img class="d-block w-100" src="..." alt="First slide">
+              //     </div>
+              //     <div class="carousel-item">
+              //       <img class="d-block w-100" src="..." alt="Second slide">
+              //     </div>
+              //     <div class="carousel-item">
+              //       <img class="d-block w-100" src="..." alt="Third slide">
+              //     </div>
+              //   </div>
+              //   <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+              //     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              //     <span class="sr-only">Previous</span>
+              //   </a>
+              //   <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+              //     <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              //     <span class="sr-only">Next</span>
+              //   </a>
+              // </div>
 
 }
