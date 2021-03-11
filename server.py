@@ -33,6 +33,7 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
             print(outputString)
             print(mapAcc)
             print(outputDf)
+            
             # return json.dumps(json.loads(SARSdf.to_json()))
             # SARSdf.to_json('jsonfiletest.json')
             return SARSdf.to_json(), calReddf.to_json(), outputString, platePassed

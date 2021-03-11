@@ -218,8 +218,8 @@ function makeOutputHeatMap(sarsDfasObj, divPlacement, heatMapID, outputAccuracyS
     let rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
     let columns = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
     let margin = {top: 30, right: 30, bottom: 30, left: 30};
-    let width = (125 * 4) - margin.left - margin.right;
-    let height = (82 * 4) - margin.top - margin.bottom;
+    let width = (125 * 5) - margin.left - margin.right;
+    let height = (82 * 5) - margin.top - margin.bottom;
 
     let svg = d3.select(divPlacement) // .calRedDivPlacement
             .append("svg")
@@ -289,7 +289,7 @@ function makeOutputHeatMap(sarsDfasObj, divPlacement, heatMapID, outputAccuracyS
             //Read the data
                 for (var columnCount = 1; columnCount <= 12; columnCount++) {
                   for (var rowCount = 0; rowCount < 8; rowCount++) {
-                    d3.select("#"+heatMapID).selectAll() //heatMapGrid2
+                    d3.select("#"+heatMapID).selectAll("wellPositions") //heatMapGrid2
                       .data([sarsDfasObj])
                       .enter()
                       .append("rect")
@@ -309,6 +309,24 @@ function makeOutputHeatMap(sarsDfasObj, divPlacement, heatMapID, outputAccuracyS
                           return heatColor(d[columnCount][rows[rowCount]])
                         }
                       })
+
+                   d3.select("#"+heatMapID).selectAll()
+                      .data([sarsDfasObj])
+                      .enter()
+                      .append("text")
+                      .text(function(d){
+                        if (d[columnCount][rows[rowCount]] != null){
+                          return Math.round(d[columnCount][rows[rowCount]]* 100) / 100
+                        }
+                        return d[columnCount][rows[rowCount]]
+                      })
+                      .attr("x", function() {
+                        return x(columnCount) + 4;
+                      })
+                      .attr("y", function(d) {
+                        return y(rows[rowCount]) + 29;
+                      })
+                      .attr("style", "font-size: 14px;")
                   }
             }
 

@@ -293,7 +293,6 @@ def accuracyValidationMethod_96(mapAcc, file: str):
     REDdf.columns = REDdf.columns.astype('int64')
 
     accuracy_report = formatAccuracyReport(mapAcc, FAMdf, REDdf) # helper method
-
     return FAMdf, REDdf, accuracy_report.fillna('N/A')
 
 def accuracyValidationMethod_384(accuracyMap_Quad1: str,
