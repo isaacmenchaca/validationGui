@@ -241,8 +241,8 @@ def formatAccuracyReport(mapAcc, FAMdf, REDdf):
 #                         results_dict['Result'][i] = 'REPEAT' # 1/28/2021
 
                     else: # if 2000 or 20000 cps, this is an automatic fail despite repeat.
-                        results_dict['REPEAT Ct VALUE SARS-CoV-2'].append('REPEAT/FAIL') # still a fail on accuracy but write repeat anyway
-
+                        #results_dict['REPEAT Ct VALUE SARS-CoV-2'].append('REPEAT/FAIL') # still a fail on accuracy but write repeat anyway
+                        results_dict['REPEAT Ct VALUE SARS-CoV-2'].append('FAIL')
                 elif FAM >= 40:
                     results_dict['REPEAT Ct VALUE SARS-CoV-2'].append('FAIL')
 
@@ -294,7 +294,7 @@ def accuracyValidationMethod_96(mapAcc, file: str):
 
     accuracy_report = formatAccuracyReport(mapAcc, FAMdf, REDdf) # helper method
 
-    return FAMdf, accuracy_report.fillna('N/A')
+    return FAMdf, REDdf, accuracy_report.fillna('N/A')
 
 def accuracyValidationMethod_384(accuracyMap_Quad1: str,
                                 accuracyMap_Quad2: str,

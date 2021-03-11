@@ -184,17 +184,22 @@ async function compareMapButton(){
 
   if (negCount == 30 && cps100Count == 20 && cps200Count == 20 && cps2000Count == 5 && cps20000Count == 5){
     console.log("Pass that data.", negCount, cps100Count, cps200Count, cps2000Count, cps20000Count)
-    let sarsDfFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath, plateMapColorArray)();
-    let sarsDfasObj = JSON.parse(sarsDfFromPython);
+    let ctDfFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath, plateMapColorArray)();
 
-    console.log(sarsDfFromPython) // returns JSON in string
-    console.log(typeof sarsDfFromPython)
 
+
+    let sarsDfasObj = JSON.parse(ctDfFromPython[0]);
+    let calRedDfasObj = JSON.parse(ctDfFromPython[1]);
+    let outputAccuracySummaryString = ctDfFromPython[2]
+    let platePassed = ctDfFromPython[3]
 
     if (!jQuery.isEmptyObject(sarsDfasObj)){
       console.log(sarsDfasObj)
-      makeOutputHeatMap(sarsDfasObj)
-      // console.log(typeof asObj)
+      makeOutputHeatMap(sarsDfasObj, ".sarsDivPlacement", "heatMapGrid", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
+    }
+    if (!jQuery.isEmptyObject(calRedDfasObj)){
+      console.log(calRedDfasObj)
+      makeOutputHeatMap(calRedDfasObj, ".calRedDivPlacement", "heatMapGrid2", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
     }
 
 
@@ -207,22 +212,22 @@ async function compareMapButton(){
 }
 
 //---------------------------------------------------------------------------------------------------
-function makeOutputHeatMap(sarsDfasObj){
+function makeOutputHeatMap(sarsDfasObj, divPlacement, heatMapID, outputAccuracySummaryString, platePassed){
 
 
     let rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
     let columns = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
     let margin = {top: 30, right: 30, bottom: 30, left: 30};
-    let width = (125 * 5) - margin.left - margin.right;
-    let height = (82 * 5) - margin.top - margin.bottom;
+    let width = (125 * 4) - margin.left - margin.right;
+    let height = (82 * 4) - margin.top - margin.bottom;
 
-    let svg = d3.select(".sarsDivPlacement")
+    let svg = d3.select(divPlacement) // .calRedDivPlacement
             .append("svg")
             .attr("id", "heatMapSvg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
-            .attr("id", "heatMapGrid")
+            .attr("id", heatMapID) // #heatMapGrid2
             .attr("transform",
               "translate(" + margin.left + "," + margin.top + ")");
 
@@ -256,15 +261,35 @@ function makeOutputHeatMap(sarsDfasObj){
                     .call(g => g.select(".domain").remove())
                     .attr("class", "axis");
 
-          // Build color scale
-          let heatColor = d3.scaleLinear()
-            .range(["red", "white"])
-            .domain([45, 20])
+          let heatColor;
+          if (divPlacement == ".calRedDivPlacement"){
+                $(divPlacement).append($("<h5/>").html("Human CT Heatmap").attr({"style": "text-align: center;"}))
+                // Build color scale
+                heatColor = d3.scaleLinear()
+                  .range(["blue", "white"])
+                  .domain([45, 20])
+              }
+          else{
+                $(divPlacement).append($("<h5/>").html("SARS CT Heatmap").attr({"style": "text-align: center;"}))
+                // Build color scale
+                heatColor = d3.scaleLinear()
+                  .range(["red", "white"])
+                  .domain([45, 20])
+              }
+
+          if (platePassed){
+              $(divPlacement).append($("<p/>").html(outputAccuracySummaryString).attr({"style": "text-align: center; display:inline-block;width: 58%; margin: 0% 21% 0% 21%; color: green"}))
+          }
+          else{
+            $(divPlacement).append($("<p/>").html(outputAccuracySummaryString).attr({"style": "text-align: center; display:inline-block;width: 58%; margin: 0% 21% 0% 21%; color: red"}))
+          }
+
+
 
             //Read the data
                 for (var columnCount = 1; columnCount <= 12; columnCount++) {
                   for (var rowCount = 0; rowCount < 8; rowCount++) {
-                    d3.select("#heatMapGrid").selectAll()
+                    d3.select("#"+heatMapID).selectAll() //heatMapGrid2
                       .data([sarsDfasObj])
                       .enter()
                       .append("rect")
@@ -286,6 +311,9 @@ function makeOutputHeatMap(sarsDfasObj){
                       })
                   }
             }
+
+
+
 
 }
 
@@ -440,9 +468,6 @@ function addDropButtons(){
                                 .append($("<div/>").addClass("carousel-inner")
                                                    .append($("<div/>").addClass("carousel-item active sarsDivPlacement"))
                                                    .append($("<div/>").addClass("carousel-item calRedDivPlacement"))
-                                // <div class="carousel-item active">
-                                //       <img class="d-block w-100" src="..." alt="First slide">
-                                //     </div>
                                        )
                                 .append($("<a/>").addClass("carousel-control-prev").attr({"href":"#MapCarouselIndicators", "role":"button", "data-slide":"prev"})
                                                  .append($("<span/>").addClass("carousel-control-prev-icon").attr({"aria-hidden": "true"}))
@@ -455,43 +480,6 @@ function addDropButtons(){
                       )
 
 
-                      // <div id="MapCarouselIndicators" class="carousel slide" data-ride="carousel">
-                      //      <ol class="carousel-indicators">
-                      //        <li data-target="#MapCarouselIndicators" data-slide-to="0" class="active"></li>
-                      //        <li data-target="#MapCarouselIndicators" data-slide-to="1"></li>
-                      //      </ol>
-                      //      <div class="carousel-inner">
-                      //        <div class="carousel-item active sarsDivPlacement">
-                      //           <!-- <img class="d-block w-100" src="..." alt="First slide"> -->
-                      //       </div>
-                      //     </div>
-                      // </div>
 
-              // <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
-              //   <ol class="carousel-indicators">
-              //     <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
-              //     <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
-              //     <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
-              //   </ol>
-              //   <div class="carousel-inner">
-              //     <div class="carousel-item active">
-              //       <img class="d-block w-100" src="..." alt="First slide">
-              //     </div>
-              //     <div class="carousel-item">
-              //       <img class="d-block w-100" src="..." alt="Second slide">
-              //     </div>
-              //     <div class="carousel-item">
-              //       <img class="d-block w-100" src="..." alt="Third slide">
-              //     </div>
-              //   </div>
-              //   <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
-              //     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              //     <span class="sr-only">Previous</span>
-              //   </a>
-              //   <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
-              //     <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              //     <span class="sr-only">Next</span>
-              //   </a>
-              // </div>
 
 }
