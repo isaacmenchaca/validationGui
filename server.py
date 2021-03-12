@@ -25,28 +25,35 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
 
     if textValidationType == 'Accuracy':
         if textPlateType == 96:
-            print('FIXME: Run python Accuracy 96 method')
-            # print(np.resize(np.array(inputInfo), [12, 8]).T)
+
             mapAcc = javascriptAccuracyMap2Dataframe(np.resize(np.array(inputInfo), [12, 8]).T)
             SARSdf, calReddf, outputDf = accuracyValidationMethod_96(mapAcc, file = filePath)
             outputString, platePassed = accuracyEvaluationSummary(outputDf)
-            print(outputString)
-            print(mapAcc)
-            print(outputDf)
-            
-            # return json.dumps(json.loads(SARSdf.to_json()))
-            # SARSdf.to_json('jsonfiletest.json')
+            # print(outputString)
+            # print(mapAcc)
+            # print(outputDf)
+
             return SARSdf.to_json(), calReddf.to_json(), outputString, platePassed
         elif textPlateType == 384:
             if textQuadrantSplitType == "No":
                 print('FIXME: Run python Accuracy 384 method')
             elif textQuadrantSplitType == "Yes":
                 print('FIXME: Run python Accuracy 384 method with Quadrants split')
-
+# -->>>>>>>>>>>>>>
     elif textValidationType == 'Uniformity':
         if textPlateType == 96:
             print('FIXME: Run python Uniformity 96 method')
-            uniformityValidationMethod(file = filePath, input384 = False).to_excel('TESTONGUI')
+            SARSdf, calReddf, outputDf = uniformityValidationMethod(file = filePath, input384 = False)
+            outputString, platePassed = uniformityEvaluationSummary(SARSdf, calReddf)
+
+            print(SARSdf)
+            print(calReddf)
+            print(outputDf)
+
+            return SARSdf.to_json(), calReddf.to_json(), outputString, platePassed
+
+#-->>>>>>>>>>>>>>
+
         elif textPlateType == 384:
             if textQuadrantSplitType == "No":
                 print('FIXME: Run python Uniformity 384 method')
@@ -55,7 +62,7 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
                 return uniformJson # delete right after
             elif textQuadrantSplitType == "Yes":
                 print('FIXME: Run python Uniformity 384 method with Quadrants split')
-
+#-->>>>>>>>>>>>>>
     elif textValidationType == 'Checkerboard':
         if textPlateType == 96:
             print('FIXME: Run python Checkerboard 96 method')
@@ -120,6 +127,32 @@ def accuracyEvaluationSummary(df):
             outputString = 'Plate Passed. Accuracy Summary: Negative = %.2f%%, 100 = %.2f%%, 200 = %.2f%%, 2000 = %.2f%%, 20000 = %.2f%%, %d total repeats'% (percentageNeg * 100, percentage100 * 100, percentage200 * 100, percentage2000 * 100, percentage20000 * 100, totalRepeats)
 
     return outputString, platePassed
+
+# ------------------------------------------------------------------------------
+def uniformityEvaluationSummary(SARSdf, calReddf):
+    SARSdfMean = SARSdf.values.mean()
+    SARSdfSTD = SARSdf.values.std()
+    SARSdfRange = SARSdf.values.max() - SARSdf.values.min()
+
+    calReddfMean = calReddf.values.mean()
+    calReddfSTD = calReddf.values.std()
+    calReddRange = calReddf.values.max() - calReddf.values.min()
+
+    outputString = ''
+    platePassed = True
+    if (SARSdfRange > 1.50) or (calReddRange > 1.50):
+        if np.isnan(SARSdfRange) or np.isnan(calReddRange):
+            outputString = 'Plate Failed. Uniformity CT Summary: Plate contained an absent CT value(s) for either SARS or Human (Cal Red).'
+        else:
+            outputString = 'Plate Failed. Uniformity CT Summary: SARS (Mean = %.2f ± %.2f, MAX - MIN = %.2f), Human (Mean = %.2f ± %.2f, MAX - MIN = %.2f)' \
+                                % (SARSdfMean, SARSdfSTD, SARSdfRange, calReddfMean, calReddfSTD, calReddRange)
+        platePassed = False
+    else:
+        outputString = 'Plate Passed. Uniformity CT Summary: SARS (Mean = %.2f ± %.2f, MAX - MIN = %.2f), Human (Mean = %.2f ± %.2f, MAX - MIN = %.2f)' \
+                            % (SARSdfMean, SARSdfSTD, SARSdfRange, calReddfMean, calReddfSTD, calReddRange)
+
+    return outputString, platePassed
+
 
 
 

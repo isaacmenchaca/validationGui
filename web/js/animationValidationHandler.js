@@ -184,14 +184,14 @@ async function compareMapButton(){
 
   if (negCount == 30 && cps100Count == 20 && cps200Count == 20 && cps2000Count == 5 && cps20000Count == 5){
     console.log("Pass that data.", negCount, cps100Count, cps200Count, cps2000Count, cps20000Count)
-    let ctDfFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath, plateMapColorArray)();
+    let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath, plateMapColorArray)();
 
 
 
-    let sarsDfasObj = JSON.parse(ctDfFromPython[0]);
-    let calRedDfasObj = JSON.parse(ctDfFromPython[1]);
-    let outputAccuracySummaryString = ctDfFromPython[2]
-    let platePassed = ctDfFromPython[3]
+    let sarsDfasObj = JSON.parse(dataFromPython[0]);
+    let calRedDfasObj = JSON.parse(dataFromPython[1]);
+    let outputAccuracySummaryString = dataFromPython[2]
+    let platePassed = dataFromPython[3]
 
     if (!jQuery.isEmptyObject(sarsDfasObj)){
       console.log(sarsDfasObj)
@@ -201,14 +201,11 @@ async function compareMapButton(){
       console.log(calRedDfasObj)
       makeOutputHeatMap(calRedDfasObj, ".calRedDivPlacement", "heatMapGrid2", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
     }
-
-
     $('#inputMapModal').modal("hide")
   }
   else{
     console.log("Dont pass that data.", negCount, cps100Count, cps200Count, cps2000Count, cps20000Count)
   }
-  // console.log(plateMapColorArray)
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -284,8 +281,6 @@ function makeOutputHeatMap(sarsDfasObj, divPlacement, heatMapID, outputAccuracyS
             $(divPlacement).append($("<p/>").html(outputAccuracySummaryString).attr({"style": "text-align: center; display:inline-block;width: 58%; margin: 0% 21% 0% 21%; color: red"}))
           }
 
-
-
             //Read the data
                 for (var columnCount = 1; columnCount <= 12; columnCount++) {
                   for (var rowCount = 0; rowCount < 8; rowCount++) {
@@ -329,10 +324,6 @@ function makeOutputHeatMap(sarsDfasObj, divPlacement, heatMapID, outputAccuracyS
                       .attr("style", "font-size: 14px;")
                   }
             }
-
-
-
-
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -387,26 +378,33 @@ async function onClickGoButton(){
     console.log(textPlateType);
     console.log(textQuadrantSplitType);
 
-    if (textValidationType == "Accuracy"){
-     // hide
+    if (textValidationType == "Accuracy" && textPlateType == 96){ // ACCURACY 96
       // make modal pop up here.
       $('#inputMapModal').modal("show")
-      // <button type="plateMapSubmit button" class="reload btn btn-primary">Submit</button>
       initialPlateMap()
       $('#plateMapSubmit').click(function(){compareMapButton()})
-
-      // $('.modal-footer').append($("<button/>").addClass("btn btn-primary").attr({"type": "button", "id": "plateMapSubmit"}).html("Submit").click(function(){compareMapButton()})
-
-
-
-      // obtain value of modal pop up to mapInput and then push the variable into a function.
-      //jsonReturnFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)()
     }
-    else{
-      console.log("else stuff activated")
-      jsonReturnFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)()
-      console.log(jsonReturnFromPython)
+    else if (textValidationType == "Uniformity" && textPlateType == 96){ // UNIFORMITY 96
+
+      let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)();
+      let sarsDfasObj = JSON.parse(dataFromPython[0]);
+      let calRedDfasObj = JSON.parse(dataFromPython[1]);
+      let outputAccuracySummaryString = dataFromPython[2]
+      let platePassed = dataFromPython[3]
+
+      console.log(outputAccuracySummaryString)
+      console.log(platePassed)
+
+      if (!jQuery.isEmptyObject(sarsDfasObj)){
+        console.log(sarsDfasObj)
+        makeOutputHeatMap(sarsDfasObj, ".sarsDivPlacement", "heatMapGrid", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
+      }
+      if (!jQuery.isEmptyObject(calRedDfasObj)){
+        console.log(calRedDfasObj)
+        makeOutputHeatMap(calRedDfasObj, ".calRedDivPlacement", "heatMapGrid2", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
+      }
     }
+
   }
 
   else{ // do something if one of the values are undefined.

@@ -120,7 +120,7 @@ def uniformitySetUp(sarsdf, REDdf, input384):
                           'Result']]
     return df
 
-def uniformityValidationMethod(file: str, heatmap: bool = False, input384 = False,
+def uniformityValidationMethod(file: str, input384 = False,
                                quadrants384_to_96Method = False):
 
     sarsdf = pd.read_excel(file,
@@ -140,10 +140,11 @@ def uniformityValidationMethod(file: str, heatmap: bool = False, input384 = Fals
     REDdf.columns = REDdf.columns.astype('int64')
 
 
-    if quadrants384_to_96Method == False:
-        printStats(sarsdf, REDdf)
-        return sarsdf # uniformitySetUp(sarsdf, REDdf, input384).round(decimals = 2)
+    if quadrants384_to_96Method == False: # works for both 384 and 96 methods.
+        # printStats(sarsdf, REDdf)
+        return sarsdf, REDdf, uniformitySetUp(sarsdf, REDdf, input384).round(decimals = 2)
 
+    # focus on this part after for 384 split quadrants!!
     elif quadrants384_to_96Method == True:
         dfs_96 = []
 
@@ -152,9 +153,9 @@ def uniformityValidationMethod(file: str, heatmap: bool = False, input384 = Fals
 
         for sars, red in zip([sarsQUAD1_96, sarsQUAD2_96, sarsQUAD3_96, sarsQUAD4_96],
                             [redQUAD1_96, redQUAD2_96, redQUAD3_96, redQUAD4_96]):
-            printStats(sars, red)
+            # printStats(sars, red)
 
             dfs_96.append(uniformitySetUp(sars, red, input384 = False).round(decimals = 2))
 
 
-        return sarsdf#dfs_96
+        return sarsdf, REDdf#dfs_96
