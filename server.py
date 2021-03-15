@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from uniformityValidationMethod import uniformityValidationMethod
 from accuracyValidationMethod import accuracyValidationMethod_96
+from checkerBoardValidationMethod import checkerBoardValidationMethod
 # Set web files folder and optionally specify which file types to check for eel.expose()
 #   *Default allowed_extensions are: ['.js', '.html', '.txt', '.htm', '.xhtml']
 eel.init('web')
@@ -32,8 +33,9 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
             # print(outputString)
             # print(mapAcc)
             # print(outputDf)
-
             return SARSdf.to_json(), calReddf.to_json(), outputString, platePassed
+# -->>>>>>>>>>>>>>
+
         elif textPlateType == 384:
             if textQuadrantSplitType == "No":
                 print('FIXME: Run python Accuracy 384 method')
@@ -42,14 +44,8 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
 # -->>>>>>>>>>>>>>
     elif textValidationType == 'Uniformity':
         if textPlateType == 96:
-            print('FIXME: Run python Uniformity 96 method')
             SARSdf, calReddf, outputDf = uniformityValidationMethod(file = filePath, input384 = False)
             outputString, platePassed = uniformityEvaluationSummary(SARSdf, calReddf)
-
-            print(SARSdf)
-            print(calReddf)
-            print(outputDf)
-
             return SARSdf.to_json(), calReddf.to_json(), outputString, platePassed
 
 #-->>>>>>>>>>>>>>
@@ -66,6 +62,15 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
     elif textValidationType == 'Checkerboard':
         if textPlateType == 96:
             print('FIXME: Run python Checkerboard 96 method')
+            SARSdf, calReddf, outputDf = checkerBoardValidationMethod(file = filePath, input384 = False)
+            outputString, platePassed = checkerBoardEvaluationSummary(SARSdf, calReddf)
+
+            print(SARSdf)
+            print(calReddf)
+            print(outputDf)
+
+            return SARSdf.to_json(), calReddf.to_json(), outputString, platePassed
+# -->>>>>>>>>>>>>>
         elif textPlateType == 384:
             if textQuadrantSplitType == "No":
                 print('FIXME: Run python Checkerboard 384 method')
@@ -140,9 +145,9 @@ def uniformityEvaluationSummary(SARSdf, calReddf):
 
     outputString = ''
     platePassed = True
-    if (SARSdfRange > 1.50) or (calReddRange > 1.50):
+    if (SARSdfRange > 1.50) or (calReddRange > 1.50) or (np.isnan(SARSdfRange)) or (np.isnan(calReddRange)):
         if np.isnan(SARSdfRange) or np.isnan(calReddRange):
-            outputString = 'Plate Failed. Uniformity CT Summary: Plate contained an absent CT value(s) for either SARS or Human (Cal Red).'
+            outputString = 'Plate Failed. Uniformity CT Summary: Plate contained absent CT value(s) for either SARS or Human (Cal Red).'
         else:
             outputString = 'Plate Failed. Uniformity CT Summary: SARS (Mean = %.2f ± %.2f, MAX - MIN = %.2f), Human (Mean = %.2f ± %.2f, MAX - MIN = %.2f)' \
                                 % (SARSdfMean, SARSdfSTD, SARSdfRange, calReddfMean, calReddfSTD, calReddRange)
@@ -153,7 +158,95 @@ def uniformityEvaluationSummary(SARSdf, calReddf):
 
     return outputString, platePassed
 
+# ------------------------------------------------------------------------------
+
+def checkerBoardEvaluationSummary(SARSdf, calReddf, input384 = False):
+    outputString = ""
+    numRepeats = 0
+    numFailsNeg = 0
+    numFailsPos = 0
+    negativeWellsSARS = []
+    negativeWellsCalRed = []
+    controlsPassed = True
+    platePassed = True
+
+    if input384 == False:
+        for rowCase1, rowCase2 in zip(np.arange(0, 8, 2), np.arange(1, 8, 2)):
+            for colCase1 in np.arange(0, 12, 2):
+                if (rowCase1 == 0 or rowCase1 == 2) and colCase1 == 0:
+                    if not(np.isnan(calReddf.values[rowCase1, colCase1])):
+                        controlsPassed = False
+
+                    if not((np.isnan(SARSdf.values[rowCase1, colCase1])) or (SARSdf.values[rowCase1, colCase1] >= 40)):
+                        controlsPassed = False
+                else:
+                    if not (np.isnan(SARSdf.values[rowCase1, colCase1]) or (SARSdf.values[rowCase1, colCase1] >= 40)):
+                        if SARSdf.values[rowCase1, colCase1] >= 36: # repeat
+                            numRepeats +=1
+                        else:
+                            numFailsNeg += 1
+
+                negativeWellsSARS.append(SARSdf.values[rowCase1, colCase1])
+                negativeWellsCalRed.append(calReddf.values[rowCase1, colCase1])
+
+            for colCase2 in np.arange(1, 12, 2):
+                if not (np.isnan(SARSdf.values[rowCase2, colCase2]) or (SARSdf.values[rowCase2, colCase2] >= 40)):
+                        if SARSdf.values[rowCase2, colCase2] >= 36: # repeat
+                            numRepeats +=1
+                        else:
+                            numFailsNeg += 1
+
+                negativeWellsSARS.append(SARSdf.values[rowCase2, colCase2])
+                negativeWellsCalRed.append(calReddf.values[rowCase2, colCase2])
 
 
+        positiveWellsSARS = []
+        positiveWellsCalRed = []
+        for rowCase1, rowCase2 in zip(np.arange(0, 8, 2), np.arange(1, 8, 2)):
+            for colCase2 in np.arange(0, 12, 2):
+                if (rowCase2 == 0 or rowCase2 == 2) and colCase2 == 0:
+                    if (np.isnan(calReddf.values[rowCase2, colCase2])):
+                        print('Controls Failed.')
+                        controlsPassed = False
+
+                    if (np.isnan(SARSdf.values[rowCase2, colCase2])) or (SARSdf.values[rowCase2, colCase2] >= 40):
+                        print('Controls Failed.')
+                        controlsPassed = False
+
+                if np.isnan(SARSdf.values[rowCase2, colCase2]) or SARSdf.values[rowCase2, colCase2] >= 40:
+                    # print("Fail", SARSdf.values[rowCase2, colCase2])
+                    numFailsPos += 1
+
+
+                positiveWellsSARS.append(SARSdf.values[rowCase2, colCase2])
+                positiveWellsCalRed.append(calReddf.values[rowCase2, colCase2])
+
+            for colCase1 in np.arange(1, 12, 2):
+
+                if np.isnan(SARSdf.values[rowCase1, colCase1]) or SARSdf.values[rowCase1, colCase1] >= 40:
+                    numFailsPos += 1
+                    # print("Fail", SARSdf.values[rowCase1, colCase1])
+
+                positiveWellsSARS.append(SARSdf.values[rowCase1, colCase1])
+                positiveWellsCalRed.append(calReddf.values[rowCase1, colCase1])
+
+
+        percentageNeg = (46 - numFailsNeg) * 100 / 46
+        percentagePos = (46 - numFailsPos) * 100 / 46
+
+        if controlsPassed and percentageNeg >= 95 and percentagePos >= 95: # PASS CRITERIA
+            if numRepeats == 0:
+                outputString = "Plate Passed. Checkerboard Summary: Negative = %.2f%% (%d/ 46), Positive = %.2f%% (%d/ 46)." % (percentageNeg, 46 - numFailsNeg, percentagePos, 46 - numFailsPos)
+            else:
+                outputString = "Plate Passed. Checkerboard Summary: Negative = %.2f%% (%d/ 46), Positive = %.2f%% (%d/ 46), Total Repeats = %d." % (percentageNeg, 46 - numFailsNeg, percentagePos, 46 - numFailsPos, numRepeats)
+
+        else:
+            if not(controlsPassed):
+                outputString = "Plate Failed. Checkerboard Summary: Controls failed. Negative = %.2f%% (%d/ 46), Positive = %.2f%% (%d/ 46)." % (percentageNeg, 46 - numFailsNeg, percentagePos, 46 - numFailsPos)
+            else:
+                outputString = "Plate Failed. Checkerboard Summary: Negative = %.2f%% (%d/ 46), Positive = %.2f%% (%d/ 46)." % (percentageNeg, 46 - numFailsNeg, percentagePos, 46 - numFailsPos)
+            platePassed = False
+
+    return outputString, platePassed
 
 eel.start('index.html', size=(1000,800))            # Start (this blocks and enters loop)

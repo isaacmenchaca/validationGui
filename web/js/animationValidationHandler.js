@@ -264,14 +264,14 @@ function makeOutputHeatMap(sarsDfasObj, divPlacement, heatMapID, outputAccuracyS
                 // Build color scale
                 heatColor = d3.scaleLinear()
                   .range(["blue", "white"])
-                  .domain([45, 20])
+                  .domain([45, 20]) // fix to max and min
               }
           else{
                 $(divPlacement).append($("<h5/>").html("SARS CT Heatmap").attr({"style": "text-align: center;"}))
                 // Build color scale
                 heatColor = d3.scaleLinear()
                   .range(["red", "white"])
-                  .domain([45, 20])
+                  .domain([45, 10]) // fix to max and min
               }
 
           if (platePassed){
@@ -385,7 +385,25 @@ async function onClickGoButton(){
       $('#plateMapSubmit').click(function(){compareMapButton()})
     }
     else if (textValidationType == "Uniformity" && textPlateType == 96){ // UNIFORMITY 96
+      let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)();
+      let sarsDfasObj = JSON.parse(dataFromPython[0]);
+      let calRedDfasObj = JSON.parse(dataFromPython[1]);
+      let outputAccuracySummaryString = dataFromPython[2]
+      let platePassed = dataFromPython[3]
 
+      console.log(outputAccuracySummaryString)
+      console.log(platePassed)
+
+      if (!jQuery.isEmptyObject(sarsDfasObj)){
+        console.log(sarsDfasObj)
+        makeOutputHeatMap(sarsDfasObj, ".sarsDivPlacement", "heatMapGrid", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
+      }
+      if (!jQuery.isEmptyObject(calRedDfasObj)){
+        console.log(calRedDfasObj)
+        makeOutputHeatMap(calRedDfasObj, ".calRedDivPlacement", "heatMapGrid2", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
+      }
+    }
+    else if (textValidationType == "Checkerboard" && textPlateType == 96){
       let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)();
       let sarsDfasObj = JSON.parse(dataFromPython[0]);
       let calRedDfasObj = JSON.parse(dataFromPython[1]);
