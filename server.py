@@ -32,7 +32,7 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
             outputString, platePassed = accuracyEvaluationSummary(outputDf)
             # print(outputString)
             # print(mapAcc)
-            # print(outputDf)
+            print(outputDf)
             return SARSdf.to_json(), calReddf.to_json(), outputString, platePassed
 # -->>>>>>>>>>>>>>
 
@@ -145,8 +145,8 @@ def uniformityEvaluationSummary(SARSdf, calReddf):
 
     outputString = ''
     platePassed = True
-    if (SARSdfRange > 1.50) or (calReddRange > 1.50) or (np.isnan(SARSdfRange)) or (np.isnan(calReddRange)):
-        if np.isnan(SARSdfRange) or np.isnan(calReddRange):
+    if (SARSdfRange > 1.50) or (calReddRange > 1.50) or (np.isnan(SARSdfMean)) or (np.isnan(calReddfMean)):
+        if np.isnan(SARSdfMean) or np.isnan(calReddfMean):
             outputString = 'Plate Failed. Uniformity CT Summary: Plate contained absent CT value(s) for either SARS or Human (Cal Red).'
         else:
             outputString = 'Plate Failed. Uniformity CT Summary: SARS (Mean = %.2f ± %.2f, MAX - MIN = %.2f), Human (Mean = %.2f ± %.2f, MAX - MIN = %.2f)' \

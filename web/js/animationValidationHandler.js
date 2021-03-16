@@ -23,8 +23,8 @@ var controlAndNaNWells = ["A1", "B1", "C1", "D1", "E11", "F11", "G11", "H11",
 //---------------------------------------------------------------------------------------------------
 function initialPlateMap(){
   // Deletes previous plate if exist
-  d3.select("#inputPlate").selectAll('svg').remove();
-
+//  d3.select("#inputPlate").selectAll('svg').remove();
+  $("#inputPlate").empty()
   // Labels of row and columns and size of the SVG
   var rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
   var columns = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
@@ -148,8 +148,8 @@ async function compareMapButton(){
   var cps20000Count = 0
   var plateMapColorArray = new Array(96);
 
-  $("rect").each( function( index, element ){
-     // console.log(index, $(element));
+  $("#inGridSvg rect").each( function( index, element){ // included #inGridSvg
+     console.log(index, $(element));
      // d3.select("#" + wellPosID).style('fill')
      concentrationOfSpike = d3.select("#" + $(element).attr("id")).style('fill');
      if(!controlAndNaNWells.includes($(element).attr("id"))){
@@ -211,6 +211,7 @@ async function compareMapButton(){
 //---------------------------------------------------------------------------------------------------
 function makeOutputHeatMap(sarsDfasObj, divPlacement, heatMapID, outputAccuracySummaryString, platePassed){
 
+    $(divPlacement).empty()
 
     let rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
     let columns = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
