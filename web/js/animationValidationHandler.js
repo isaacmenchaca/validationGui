@@ -210,7 +210,6 @@ async function compareMapButton(){
 
 //---------------------------------------------------------------------------------------------------
 function makeOutputHeatMap(sarsDfasObj, divPlacement, heatMapID, outputAccuracySummaryString, platePassed){
-
     $(divPlacement).empty()
 
     let rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
@@ -326,6 +325,146 @@ function makeOutputHeatMap(sarsDfasObj, divPlacement, heatMapID, outputAccuracyS
                   }
             }
 }
+//---------------------------------------------------------------------------------------------------
+function makeOutputHeatMap384(sarsDfasObj, divPlacement, heatMapID){ //, outputAccuracySummaryString, platePassed){
+    $(divPlacement).empty()
+
+    let rows = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"];
+    let columns = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
+                  "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"];
+    let margin = {top: 30, right: 30, bottom: 30, left: 30};
+    let width = (125 * 5) - margin.left - margin.right;
+    let height = (82 * 5) - margin.top - margin.bottom;
+
+    let svg = d3.select(divPlacement) // .calRedDivPlacement
+            .append("svg")
+            .attr("id", "heatMapSvg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("id", heatMapID) // #heatMapGrid2
+            .attr("transform",
+              "translate(" + margin.left + "," + margin.top + ")");
+
+
+          // you have to have an x and y variable for array/ matrices.
+          // Build X scales and axis:
+          let x = d3.scaleBand() // just a scale
+                      .domain(columns) // represents matrix location
+                      .range([0, width])
+                      .padding(0.01)
+
+
+          // Build Y scales and axis:
+          let y = d3.scaleBand() // just a scale
+                      .domain(rows) // domain is 8, represents matrix location
+                      .range([0, height]) // divides domain up by this much?
+                      .padding(0.01)
+
+
+          // SVG generate X axis
+          // svg.append("g").attr("transform", "translate(0,"+height+")").call(d3.axisBottom(x));
+          svg.append("g")
+                    .attr("transform", "translate(0, -2)") // this was for the distance between the axis line
+                    .call(d3.axisTop(x).tickSize([0, 0]))
+                    .call(g => g.select(".domain").remove()) // to remove the ticks (lines of the ticks)
+                    .attr("class", "axis");
+          // SVG generate Y axis
+          svg.append("g")
+                    .attr("transform", "translate(-2, 0)")
+                    .call(d3.axisLeft(y).tickSize([0, 0]))
+                    .call(g => g.select(".domain").remove())
+                    .attr("class", "axis");
+
+          let heatColor;
+          if (divPlacement == ".calRedDivPlacement"){
+                $(divPlacement).append($("<h5/>").html("Human CT Heatmap").attr({"style": "text-align: center;"}))
+                // Build color scale
+                heatColor = d3.scaleLinear()
+                  .range(["blue", "white"])
+                  .domain([45, 20]) // fix to max and min
+              }
+          else{
+                $(divPlacement).append($("<h5/>").html("SARS CT Heatmap").attr({"style": "text-align: center;"}))
+                // Build color scale
+                heatColor = d3.scaleLinear()
+                  .range(["red", "white"])
+                  .domain([45, 10]) // fix to max and min
+              }
+
+          // if (platePassed){
+          //     $(divPlacement).append($("<p/>").html(outputAccuracySummaryString).attr({"style": "text-align: center; display:inline-block;width: 58%; margin: 0% 21% 0% 21%; color: green"}))
+          // }
+          // else{
+          //   $(divPlacement).append($("<p/>").html(outputAccuracySummaryString).attr({"style": "text-align: center; display:inline-block;width: 58%; margin: 0% 21% 0% 21%; color: red"}))
+          // }
+
+            //Read the data
+
+            var tooltip = d3.select(divPlacement)
+                            .append("div")
+                            .style("opacity", 0)
+                            .attr("class", "tooltip")
+                            .style("background-color", "white")
+                            .style("border", "solid")
+                            .style("border-width", "2px")
+                            .style("border-radius", "5px")
+                            .style("padding", "5px")
+            var mouseover = function(d) {
+                tooltip
+                  .style("opacity", 1)
+                d3.select(this)
+                  .style("stroke-width", "2")
+                  .style("opacity", 0.2)
+              }
+              var mousemove = function(d) {
+                tooltip
+                  .html("The exact value of<br>this cell is: ")
+                  .style("left", (d3.pointer(d)[0]) + "px")
+                  .style("top", (d3.pointer(d)[1]+35) + "px")
+              }
+              var mouseleave = function(d) {
+                tooltip
+                  .style("opacity", 0)
+                d3.select(this)
+                  .style("stroke-width", "1")
+                  .style("opacity", 1)
+              }
+
+
+
+                for (var columnCount = 1; columnCount <= 24; columnCount++) {
+                  for (var rowCount = 0; rowCount < 16; rowCount++) {
+                    let wellId =  rows[rowCount] + columns[columnCount - 1]
+                    // console.log(wellId)
+
+                    d3.select("#"+heatMapID).selectAll("wellPositions") //heatMapGrid2
+                      .data([sarsDfasObj])
+                      .enter()
+                      .append("rect")
+                      .attr("id", wellId)
+                      .attr("x", function() {
+                        return x(columnCount)
+                      })
+                      .attr("y", function(d) {
+                        return y(rows[rowCount])
+                      })
+                      .attr("width", x.bandwidth())
+                      .attr("height", y.bandwidth())
+                      .attr("style", "stroke:black;stroke-width:1")
+                      .style("fill", function(d) {
+                        if (d[columnCount][rows[rowCount]] >= 40) {
+                          return heatColor(null)
+                        } else {
+                          return heatColor(d[columnCount][rows[rowCount]])
+                        }
+                      })
+                      .on("mouseover", mouseover)
+                      .on("mousemove", mousemove)
+                      .on("mouseleave", mouseleave)
+                  }
+            }
+}
 
 //---------------------------------------------------------------------------------------------------
 async function onClickValidationTypeButton(value){
@@ -404,6 +543,25 @@ async function onClickGoButton(){
         makeOutputHeatMap(calRedDfasObj, ".calRedDivPlacement", "heatMapGrid2", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
       }
     }
+
+    else if (textValidationType == "Uniformity" && textPlateType == 384 && textQuadrantSplitType == "No"){
+      let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)();
+      let sarsDfasObj = JSON.parse(dataFromPython[0])
+      let calRedDfasObj = JSON.parse(dataFromPython[1])
+
+      if (!jQuery.isEmptyObject(sarsDfasObj)){
+        console.log(sarsDfasObj)
+        makeOutputHeatMap384(sarsDfasObj, ".sarsDivPlacement", "heatMapGrid") //, outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
+      }
+      if (!jQuery.isEmptyObject(calRedDfasObj)){
+        console.log(calRedDfasObj)
+        makeOutputHeatMap384(calRedDfasObj, ".calRedDivPlacement", "heatMapGrid2") //, outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
+      }
+
+    }
+
+
+
     else if (textValidationType == "Checkerboard" && textPlateType == 96){
       let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)();
       let sarsDfasObj = JSON.parse(dataFromPython[0]);
@@ -501,8 +659,10 @@ function addDropButtons(){
                                                   .append($("<li/>").attr({"data-target":"MapCarouselIndicators", "data-slide-to": "1"}))
                                        )
                                 .append($("<div/>").addClass("carousel-inner")
-                                                   .append($("<div/>").addClass("carousel-item active sarsDivPlacement"))
-                                                   .append($("<div/>").addClass("carousel-item calRedDivPlacement"))
+                                                   .append($("<div/>").addClass("carousel-item active sarsDivPlacement")
+                                                                      .append($("<div/>").addClass("tooltip")))
+                                                   .append($("<div/>").addClass("carousel-item calRedDivPlacement")
+                                                                      .append($("<div/>").addClass("tooltip")))
                                        )
                                 .append($("<a/>").addClass("carousel-control-prev").attr({"href":"#MapCarouselIndicators", "role":"button", "data-slide":"prev"})
                                                  .append($("<span/>").addClass("carousel-control-prev-icon").attr({"aria-hidden": "true"}))
@@ -513,8 +673,4 @@ function addDropButtons(){
                                                   // .append($("<span/>").addClass("sr-only"))
                                       )
                       )
-
-
-
-
 }

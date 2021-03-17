@@ -53,11 +53,16 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
         elif textPlateType == 384:
             if textQuadrantSplitType == "No":
                 print('FIXME: Run python Uniformity 384 method')
-                uniformJson = uniformityValidationMethod(file = filePath, input384=True).to_json()
+                SARSdf, calReddf, outputDf = uniformityValidationMethod(file = filePath, input384 = False)
+                print(SARSdf)
+                print(calReddf)
+                print(outputDf)
+                return SARSdf.to_json(), calReddf.to_json() # outputString, platePassed
 
-                return uniformJson # delete right after
+#-->>>>>>>>>>>>>>
             elif textQuadrantSplitType == "Yes":
                 print('FIXME: Run python Uniformity 384 method with Quadrants split')
+
 #-->>>>>>>>>>>>>>
     elif textValidationType == 'Checkerboard':
         if textPlateType == 96:
