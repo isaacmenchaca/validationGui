@@ -52,17 +52,6 @@ def quadrants384_to_96(data):
 
     return QUAD1_96, QUAD2_96, QUAD3_96, QUAD4_96
 
-def printStats(sarsdf, REDdf):
-    print('Sars Mean:', sarsdf.values.mean(), '±', sarsdf.values.std())
-    print('Sars Max - Min:', sarsdf.values.max() - sarsdf.values.min())
-    print(sarsdf.values.max(), sarsdf.values.min())
-    print()
-
-    print('Cal Red Mean:', REDdf.values.mean(), '±', REDdf.values.std())
-    print('Cal Red Max - Min:', REDdf.values.max() - REDdf.values.min())
-    print(REDdf.values.max(), REDdf.values.min())
-    return
-
 def uniformitySetUp(sarsdf, REDdf, input384):
     FAMdf = sarsdf.copy()
     REDdf = REDdf.copy()

@@ -417,12 +417,25 @@ function makeOutputHeatMap384(sarsDfasObj, divPlacement, heatMapID){ //, outputA
                   .style("stroke-width", "2")
                   .style("opacity", 0.2)
               }
-              var mousemove = function(d) {
+              var mousemove = function(d, i) {
+                // console.log(d)
+                let rowId = $(this).attr('id')[0]
+                let colId = $(this).attr('id').slice(1)
+
+                // console.log(i[colId][rowId])
+                if (i[colId][rowId] != null){
                 tooltip
-                  .html("The exact value of<br>this cell is: ")
+                  .html("The CT value of<br>" + rowId + colId + " is: " + Math.round(i[colId][rowId] * 100) / 100)
                   .style("left", (d3.pointer(d)[0]) + "px")
                   .style("top", (d3.pointer(d)[1]+35) + "px")
               }
+              else{
+                tooltip
+                  .html("The CT value of<br>" + rowId + colId + " is: N/A")
+                  .style("left", (d3.pointer(d)[0]) + "px")
+                  .style("top", (d3.pointer(d)[1]+35) + "px")
+              }
+            }
               var mouseleave = function(d) {
                 tooltip
                   .style("opacity", 0)
