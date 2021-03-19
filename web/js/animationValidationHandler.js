@@ -326,7 +326,7 @@ function makeOutputHeatMap(sarsDfasObj, divPlacement, heatMapID, outputAccuracyS
             }
 }
 //---------------------------------------------------------------------------------------------------
-function makeOutputHeatMap384(sarsDfasObj, divPlacement, heatMapID){ //, outputAccuracySummaryString, platePassed){
+function makeOutputHeatMap384(sarsDfasObj, divPlacement, heatMapID, outputAccuracySummaryString, platePassed){
     $(divPlacement).empty()
 
     let rows = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"];
@@ -392,12 +392,12 @@ function makeOutputHeatMap384(sarsDfasObj, divPlacement, heatMapID){ //, outputA
                   .domain([45, 10]) // fix to max and min
               }
 
-          // if (platePassed){
-          //     $(divPlacement).append($("<p/>").html(outputAccuracySummaryString).attr({"style": "text-align: center; display:inline-block;width: 58%; margin: 0% 21% 0% 21%; color: green"}))
-          // }
-          // else{
-          //   $(divPlacement).append($("<p/>").html(outputAccuracySummaryString).attr({"style": "text-align: center; display:inline-block;width: 58%; margin: 0% 21% 0% 21%; color: red"}))
-          // }
+          if (platePassed){
+              $(divPlacement).append($("<p/>").html(outputAccuracySummaryString).attr({"style": "text-align: center; display:inline-block;width: 58%; margin: 0% 21% 0% 21%; color: green"}))
+          }
+          else{
+            $(divPlacement).append($("<p/>").html(outputAccuracySummaryString).attr({"style": "text-align: center; display:inline-block;width: 58%; margin: 0% 21% 0% 21%; color: red"}))
+          }
 
             //Read the data
 
@@ -422,14 +422,13 @@ function makeOutputHeatMap384(sarsDfasObj, divPlacement, heatMapID){ //, outputA
                 let rowId = $(this).attr('id')[0]
                 let colId = $(this).attr('id').slice(1)
 
-                // console.log(i[colId][rowId])
                 if (i[colId][rowId] != null){
                 tooltip
                   .html("The CT value of<br>" + rowId + colId + " is: " + Math.round(i[colId][rowId] * 100) / 100)
                   .style("left", (d3.pointer(d)[0]) + "px")
                   .style("top", (d3.pointer(d)[1]+35) + "px")
               }
-              else{
+                else{
                 tooltip
                   .html("The CT value of<br>" + rowId + colId + " is: N/A")
                   .style("left", (d3.pointer(d)[0]) + "px")
@@ -519,6 +518,14 @@ async function onClickChooseFileButton(){
      filePath = path
    }
 }
+//---------------------------------------------------------------------------------------------------
+// async function saveFileDialog(){
+//   var saveFilePath = await eel.popUpSaveNotSplit()();
+//   console.log(typeof(saveFilePath))
+//   if (saveFilePath) {
+//     console.log(saveFilePath);
+//   }
+// }
 
 //---------------------------------------------------------------------------------------------------
 async function onClickGoButton(){
@@ -561,16 +568,19 @@ async function onClickGoButton(){
       let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)();
       let sarsDfasObj = JSON.parse(dataFromPython[0])
       let calRedDfasObj = JSON.parse(dataFromPython[1])
+      let outputAccuracySummaryString = dataFromPython[2]
+      let platePassed = dataFromPython[3]
 
       if (!jQuery.isEmptyObject(sarsDfasObj)){
         console.log(sarsDfasObj)
-        makeOutputHeatMap384(sarsDfasObj, ".sarsDivPlacement", "heatMapGrid") //, outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
+        makeOutputHeatMap384(sarsDfasObj, ".sarsDivPlacement", "heatMapGrid", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
       }
       if (!jQuery.isEmptyObject(calRedDfasObj)){
         console.log(calRedDfasObj)
-        makeOutputHeatMap384(calRedDfasObj, ".calRedDivPlacement", "heatMapGrid2") //, outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
+        makeOutputHeatMap384(calRedDfasObj, ".calRedDivPlacement", "heatMapGrid2", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
       }
 
+      // saveFileDialog()
     }
 
 
@@ -595,12 +605,14 @@ async function onClickGoButton(){
       }
     }
 
+
   }
 
   else{ // do something if one of the values are undefined.
 
     console.log('nothing input')
   }
+
 }
 //---------------------------------------------------------------------------------------------------
 

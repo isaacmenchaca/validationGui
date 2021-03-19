@@ -130,7 +130,6 @@ def uniformityValidationMethod(file: str, input384 = False,
 
 
     if quadrants384_to_96Method == False: # works for both 384 and 96 methods.
-        # printStats(sarsdf, REDdf)
         return sarsdf, REDdf, uniformitySetUp(sarsdf, REDdf, input384).round(decimals = 2)
 
     # focus on this part after for 384 split quadrants!!
@@ -142,7 +141,6 @@ def uniformityValidationMethod(file: str, input384 = False,
 
         for sars, red in zip([sarsQUAD1_96, sarsQUAD2_96, sarsQUAD3_96, sarsQUAD4_96],
                             [redQUAD1_96, redQUAD2_96, redQUAD3_96, redQUAD4_96]):
-            # printStats(sars, red)
 
             dfs_96.append(uniformitySetUp(sars, red, input384 = False).round(decimals = 2))
 

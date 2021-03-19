@@ -15,10 +15,22 @@ eel.init('web')
 @eel.expose
 def pythonGoButtonClicked():
     root = tk.Tk()
+    root.attributes('-topmost', 1)
     root.withdraw()
-    root.wm_attributes('-topmost', 1)
     filePath = filedialog.askopenfilename()
+    root.destroy()
     return filePath
+
+def popUpSaveNotSplit(outputDf):
+    print('Pop up')
+    root = tk.Tk()
+    root.attributes('-topmost', 1)
+    root.withdraw()
+    filePath = filedialog.asksaveasfile(mode='a', defaultextension = '.xlsx')
+    root.destroy()
+    outputDf.to_excel(filePath.name)
+    return filePath
+
 # ------------------------------------------------------------------------------
 @eel.expose
 def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath, inputInfo = None):
@@ -54,10 +66,13 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
             if textQuadrantSplitType == "No":
                 print('FIXME: Run python Uniformity 384 method')
                 SARSdf, calReddf, outputDf = uniformityValidationMethod(file = filePath, input384 = False)
+                outputString, platePassed = uniformityEvaluationSummary(SARSdf, calReddf)
                 print(SARSdf)
                 print(calReddf)
                 print(outputDf)
-                return SARSdf.to_json(), calReddf.to_json() # outputString, platePassed
+                popUpSaveNotSplit(outputDf)
+
+                return SARSdf.to_json(), calReddf.to_json(), outputString, platePassed
 
 #-->>>>>>>>>>>>>>
             elif textQuadrantSplitType == "Yes":
@@ -81,8 +96,9 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
                 print('FIXME: Run python Checkerboard 384 method')
             elif textQuadrantSplitType == "Yes":
                 print('FIXME: Run python Checkerboard 384 method with Quadrants split')
+# -->>>>>>>>>>>>>>
     return
-# ------------------------------------------------------------------------------
+
 def javascriptAccuracyMap2Dataframe(jsInputData):
     mapAcc = pd.DataFrame(jsInputData)
     mapAcc.columns = np.linspace(1, 12, 12, dtype = np.int)
@@ -251,7 +267,6 @@ def checkerBoardEvaluationSummary(SARSdf, calReddf, input384 = False):
             else:
                 outputString = "Plate Failed. Checkerboard Summary: Negative = %.2f%% (%d/ 46), Positive = %.2f%% (%d/ 46)." % (percentageNeg, 46 - numFailsNeg, percentagePos, 46 - numFailsPos)
             platePassed = False
-
     return outputString, platePassed
 
 eel.start('index.html', size=(1000,800))            # Start (this blocks and enters loop)
