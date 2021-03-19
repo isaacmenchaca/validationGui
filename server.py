@@ -4,7 +4,7 @@ from tkinter import filedialog
 import numpy as np
 import pandas as pd
 from uniformityValidationMethod import uniformityValidationMethod, uniformityEvaluationSummary
-from accuracyValidationMethod import accuracyValidationMethod_96
+from accuracyValidationMethod import accuracyValidationMethod_96, accuracyEvaluationSummary
 from checkerBoardValidationMethod import checkerBoardValidationMethod, checkerBoardEvaluation, checkerBoardEvaluation96Helper, checkerBoardEvaluation384Helper
 # Set web files folder and optionally specify which file types to check for eel.expose()
 #   *Default allowed_extensions are: ['.js', '.html', '.txt', '.htm', '.xhtml']
@@ -21,7 +21,7 @@ def pythonGoButtonClicked():
     root.destroy()
     return filePath
 
-def popUpSaveNotSplit(outputDf):
+def popUpSaveNotSplit(outputDf, mapAcc = None, accuracy = False):
     print('Pop up')
     root = tk.Tk()
     root.attributes('-topmost', 1)
@@ -30,7 +30,11 @@ def popUpSaveNotSplit(outputDf):
     root.destroy()
     if filePath:
         outputDf.to_excel(filePath.name)
+        if accuracy != False:
+            mapAcc.to_excel(filePath.name[:-5] +'_AccuracyMap.xlsx')
+            return filePath, mapAcc
     return filePath
+
 
 # ------------------------------------------------------------------------------
 @eel.expose
@@ -43,9 +47,10 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
             mapAcc = javascriptAccuracyMap2Dataframe(np.resize(np.array(inputInfo), [12, 8]).T)
             SARSdf, calReddf, outputDf = accuracyValidationMethod_96(mapAcc, file = filePath)
             outputString, platePassed = accuracyEvaluationSummary(outputDf)
-            popUpSaveNotSplit(outputDf)
+            popUpSaveNotSplit(outputDf, mapAcc, accuracy = True)
             return SARSdf.to_json(), calReddf.to_json(), outputString, platePassed
 
+# -->>>>>>>>>>>>>>
         elif textPlateType == 384:
             if textQuadrantSplitType == "No":
                 print('FIXME: Run python Accuracy 384 method')
@@ -59,7 +64,6 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
             popUpSaveNotSplit(outputDf)
             return SARSdf.to_json(), calReddf.to_json(), outputString, platePassed
 
-#-->>>>>>>>>>>>>>
 
         elif textPlateType == 384:
             if textQuadrantSplitType == "No":
@@ -67,6 +71,7 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
                 outputString, platePassed = uniformityEvaluationSummary(SARSdf, calReddf)
                 popUpSaveNotSplit(outputDf)
                 return SARSdf.to_json(), calReddf.to_json(), outputString, platePassed
+#-->>>>>>>>>>>>>>
 
             elif textQuadrantSplitType == "Yes":
                 print('FIXME: Run python Uniformity 384 method with Quadrants split')
@@ -82,7 +87,6 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
 
         elif textPlateType == 384:
             if textQuadrantSplitType == "No":
-                print('FIXME: Run python Checkerboard 384 method')
                 SARSdf, calReddf, outputDf = checkerBoardValidationMethod(file = filePath, input384 = True) # input384 doesnt matter here
                 controlsPassed, numFailsNeg, numFailsPos, numRepeats = checkerBoardEvaluation384Helper(SARSdf, calReddf)
                 outputString, platePassed = checkerBoardEvaluation(controlsPassed, numFailsNeg, numFailsPos, numRepeats, input384 = True)
