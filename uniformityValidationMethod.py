@@ -1,56 +1,7 @@
 import pandas as pd # version 0.25.1
 import numpy as np # version 1.18.4
+from quadrants384_to_96 import quadrants384_to_96
 pd.set_option("display.max_rows", None, "display.max_columns", None)
-pd.options.display.float_format = '{:,.2f}'.format
-
-def quadrants384_to_96(data):
-    data = data.copy()
-
-    quad1 = []
-    for row in np.arange(0, 16, 2):
-        for col in np.arange(0, 23, 2):
-            quad1.append(data.values[row, col])
-
-
-    QUAD1_96 = pd.DataFrame(np.array(quad1).reshape([8, 12])) # 96
-    QUAD1_96.columns = np.linspace(1, 12, 12, dtype = np.int)
-    QUAD1_96['Row'] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    QUAD1_96.set_index(['Row'], inplace = True)
-
-    quad2 = []
-    for row in np.arange(0, 16, 2):
-        for col in np.arange(1, 24, 2):
-            quad2.append(data.values[row, col])
-
-
-    QUAD2_96 = pd.DataFrame(np.array(quad2).reshape([8, 12])) # 96
-    QUAD2_96.columns = np.linspace(1, 12, 12, dtype = np.int)
-    QUAD2_96['Row'] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    QUAD2_96.set_index(['Row'], inplace = True)
-
-    quad3 = []
-    for row in np.arange(1, 17, 2):
-        for col in np.arange(0, 23, 2):
-            quad3.append(data.values[row, col])
-
-
-    QUAD3_96 = pd.DataFrame(np.array(quad3).reshape([8, 12])) # 96
-    QUAD3_96.columns = np.linspace(1, 12, 12, dtype = np.int)
-    QUAD3_96['Row'] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    QUAD3_96.set_index(['Row'], inplace = True)
-
-    quad4 = []
-    for row in np.arange(1, 17, 2):
-        for col in np.arange(1, 24, 2):
-            quad4.append(data.values[row, col])
-
-
-    QUAD4_96 = pd.DataFrame(np.array(quad4).reshape([8, 12])) # 96
-    QUAD4_96.columns = np.linspace(1, 12, 12, dtype = np.int)
-    QUAD4_96['Row'] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    QUAD4_96.set_index(['Row'], inplace = True)
-
-    return QUAD1_96, QUAD2_96, QUAD3_96, QUAD4_96
 
 def uniformitySetUp(sarsdf, REDdf, input384):
     FAMdf = sarsdf.copy()
@@ -95,7 +46,7 @@ def uniformitySetUp(sarsdf, REDdf, input384):
                     specimen_result.append('Positive')
                     repeat_list.append('N/A')
 
-    checker_dict = {
+    uniformity_dict = {
         'Well': wellLocation,
         'CT Value SARS-CoV-2': FAM_CT,
         'CT Value RNASE P': CalRed_CT,
@@ -104,10 +55,12 @@ def uniformitySetUp(sarsdf, REDdf, input384):
         'Result': specimen_result
     }
 
-    df = pd.DataFrame(checker_dict).sort_values(by = ['Well row','Well col']).\
+    pd.options.display.float_format = '{:,.2f}'.format
+    uniformity_report = pd.DataFrame(uniformity_dict).round(decimals = 2)
+    uniformity_report = uniformity_report.sort_values(by = ['Well row','Well col']).\
             fillna('N/A')[['Well', 'CT Value SARS-CoV-2', 'CT Value RNASE P',
                           'Result']]
-    return df
+    return uniformity_report
 
 def uniformityValidationMethod(file: str, input384 = False,
                                quadrants384_to_96Method = False):
@@ -146,3 +99,27 @@ def uniformityValidationMethod(file: str, input384 = False,
 
 
         return sarsdf, REDdf#dfs_96
+
+def uniformityEvaluationSummary(SARSdf, calReddf):
+    SARSdfMean = SARSdf.values.mean()
+    SARSdfSTD = SARSdf.values.std()
+    SARSdfRange = SARSdf.values.max() - SARSdf.values.min()
+
+    calReddfMean = calReddf.values.mean()
+    calReddfSTD = calReddf.values.std()
+    calReddRange = calReddf.values.max() - calReddf.values.min()
+
+    outputString = ''
+    platePassed = True
+    if (SARSdfRange > 1.50) or (calReddRange > 1.50) or (np.isnan(SARSdfMean)) or (np.isnan(calReddfMean)):
+        if np.isnan(SARSdfMean) or np.isnan(calReddfMean):
+            outputString = 'Plate Failed. Uniformity CT Summary: Plate contained absent CT value(s) for either SARS or Human (Cal Red).'
+        else:
+            outputString = 'Plate Failed. Uniformity CT Summary: SARS (Mean = %.2f ± %.2f, MAX - MIN = %.2f), Human (Mean = %.2f ± %.2f, MAX - MIN = %.2f)' \
+                                % (SARSdfMean, SARSdfSTD, SARSdfRange, calReddfMean, calReddfSTD, calReddRange)
+        platePassed = False
+    else:
+        outputString = 'Plate Passed. Uniformity CT Summary: SARS (Mean = %.2f ± %.2f, MAX - MIN = %.2f), Human (Mean = %.2f ± %.2f, MAX - MIN = %.2f)' \
+                            % (SARSdfMean, SARSdfSTD, SARSdfRange, calReddfMean, calReddfSTD, calReddRange)
+
+    return outputString, platePassed

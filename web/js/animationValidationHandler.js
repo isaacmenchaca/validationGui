@@ -579,11 +579,7 @@ async function onClickGoButton(){
         console.log(calRedDfasObj)
         makeOutputHeatMap384(calRedDfasObj, ".calRedDivPlacement", "heatMapGrid2", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
       }
-
-      // saveFileDialog()
     }
-
-
 
     else if (textValidationType == "Checkerboard" && textPlateType == 96){
       let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)();
@@ -602,6 +598,24 @@ async function onClickGoButton(){
       if (!jQuery.isEmptyObject(calRedDfasObj)){
         console.log(calRedDfasObj)
         makeOutputHeatMap(calRedDfasObj, ".calRedDivPlacement", "heatMapGrid2", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
+      }
+    }
+
+    else if (textValidationType == "Checkerboard" && textPlateType == 384 && textQuadrantSplitType == "No"){
+      let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)();
+      let sarsDfasObj = JSON.parse(dataFromPython[0])
+      let calRedDfasObj = JSON.parse(dataFromPython[1])
+      let outputAccuracySummaryString = dataFromPython[2]
+
+      let platePassed = dataFromPython[3]
+
+      if (!jQuery.isEmptyObject(sarsDfasObj)){
+        console.log(sarsDfasObj)
+        makeOutputHeatMap384(sarsDfasObj, ".sarsDivPlacement", "heatMapGrid", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
+      }
+      if (!jQuery.isEmptyObject(calRedDfasObj)){
+        console.log(calRedDfasObj)
+        makeOutputHeatMap384(calRedDfasObj, ".calRedDivPlacement", "heatMapGrid2", outputAccuracySummaryString, platePassed)  //input .sarsDivPlacement,heatMapGrid
       }
     }
 

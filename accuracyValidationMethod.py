@@ -1,53 +1,6 @@
 import pandas as pd # version 0.25.1
 import numpy as np # version 1.18.4
-
-def quadrants384_to_96(data):
-
-    quad1 = []
-    for row in np.arange(0, 16, 2):
-        for col in np.arange(0, 23, 2):
-            quad1.append(data.values[row, col])
-
-
-    QUAD1_96 = pd.DataFrame(np.array(quad1).reshape([8, 12])) # 96
-    QUAD1_96.columns = np.linspace(1, 12, 12, dtype = np.int)
-    QUAD1_96['Row'] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    QUAD1_96.set_index(['Row'], inplace = True)
-
-    quad2 = []
-    for row in np.arange(0, 16, 2):
-        for col in np.arange(1, 24, 2):
-            quad2.append(data.values[row, col])
-
-
-    QUAD2_96 = pd.DataFrame(np.array(quad2).reshape([8, 12])) # 96
-    QUAD2_96.columns = np.linspace(1, 12, 12, dtype = np.int)
-    QUAD2_96['Row'] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    QUAD2_96.set_index(['Row'], inplace = True)
-
-    quad3 = []
-    for row in np.arange(1, 17, 2):
-        for col in np.arange(0, 23, 2):
-            quad3.append(data.values[row, col])
-
-
-    QUAD3_96 = pd.DataFrame(np.array(quad3).reshape([8, 12])) # 96
-    QUAD3_96.columns = np.linspace(1, 12, 12, dtype = np.int)
-    QUAD3_96['Row'] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    QUAD3_96.set_index(['Row'], inplace = True)
-
-    quad4 = []
-    for row in np.arange(1, 17, 2):
-        for col in np.arange(1, 24, 2):
-            quad4.append(data.values[row, col])
-
-
-    QUAD4_96 = pd.DataFrame(np.array(quad4).reshape([8, 12])) # 96
-    QUAD4_96.columns = np.linspace(1, 12, 12, dtype = np.int)
-    QUAD4_96['Row'] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    QUAD4_96.set_index(['Row'], inplace = True)
-
-    return QUAD1_96, QUAD2_96, QUAD3_96, QUAD4_96
+from quadrants384_to_96 import quadrants384_to_96
 
 def mapValidation(mapAcc):
 # map validation, mapping A
@@ -346,3 +299,49 @@ def accuracyValidationMethod_384(accuracyMap_Quad1: str,
         accuracy_reports = pd.concat([accuracy_reports_controls, accuracy_reports])
 
     return accuracy_reports
+
+def accuracyEvaluationSummary(df):
+    control_filter = (df["Specimen Number"] == "Control")
+    concentration_negative = (df["Specimen Concentration (cps/ mL)"] == "Negative")
+    concentration_100 = (df["Specimen Concentration (cps/ mL)"] == "100")
+    concentration_200 = (df["Specimen Concentration (cps/ mL)"] == "200")
+    concentration_2000 = (df["Specimen Concentration (cps/ mL)"] == "2000")
+    concentration_20000 = (df["Specimen Concentration (cps/ mL)"] == "20000")
+    result_Fail = (df["REPEAT Ct VALUE SARS-CoV-2"] == "FAIL")
+    result_Repeat = (df["Result"] == "REPEAT")
+    ctSarsValue_Negative = (df["CT Value SARS-CoV-2"] == "N/A")
+    ctCalRValue_Negative = (df["CT Value RNASE P"] == "N/A")
+    negativeControlFail1 = (control_filter & concentration_negative & ~ctCalRValue_Negative)
+    negativeControlFail2 = (control_filter & concentration_negative & ~ctSarsValue_Negative)
+    positiveControlFail = (control_filter & ~concentration_negative & ctCalRValue_Negative & ctSarsValue_Negative)
+
+
+    controlPassed = 'Pass'
+    if (len(df[negativeControlFail1]) != 0) or (len(df[negativeControlFail2][df[negativeControlFail2]["CT Value SARS-CoV-2"] < 40]) != 0) or (len(df[positiveControlFail]) != 0):
+        controlPassed = 'Fail'
+
+
+
+    percentageNeg = 1 - len(df[~control_filter & concentration_negative & result_Fail]) / len(df[~control_filter & concentration_negative])
+    percentage100 = 1 - len(df[~control_filter & concentration_100 & result_Fail]) / len(df[~control_filter & concentration_100])
+    percentage200 = 1 - len(df[~control_filter & concentration_200 & result_Fail]) / len(df[~control_filter & concentration_200])
+    percentage2000 = 1 - len(df[~control_filter & concentration_2000 & result_Fail]) / len(df[~control_filter & concentration_2000])
+    percentage20000 = 1 - len(df[~control_filter & concentration_20000 & result_Fail]) / len(df[~control_filter & concentration_20000])
+    totalRepeats = len(df[(df['Result'] == "REPEAT")])
+
+
+    outputString = ''
+    platePassed = True
+    if (controlPassed == "Fail") or (percentageNeg < .95) or (percentage100 < 0.5) or (percentage200 < 0.95) or (percentage2000 < 0.95) or (percentage20000 < 0.95):
+        if controlPassed == "Fail":
+            outputString = 'Plate Failed. Accuracy Summary: Controls failed, Negative = %.2f%%, 100 = %.2f%%, 200 = %.2f%%, 2000 = %.2f%%, 20000 = %.2f%%' % (percentageNeg * 100, percentage100 * 100, percentage200 * 100, percentage2000 * 100, percentage20000 * 100)
+        if controlPassed == "Pass":
+            outputString = 'Plate Failed. Accuracy Summary: Negative = %.2f%%, 100 = %.2f%%, 200 = %.2f%%, 2000 = %.2f%%, 20000 = %.2f%%' % (percentageNeg * 100, percentage100 * 100, percentage200 * 100, percentage2000 * 100, percentage20000 * 100)
+        platePassed = False
+    else:
+        if totalRepeats == 0:
+            outputString = 'Plate Passed. Accuracy Summary: Negative = %.2f%%, 100 = %.2f%%, 200 = %.2f%%, 2000 = %.2f%%, 20000 = %.2f%%' % (percentageNeg * 100, percentage100 * 100, percentage200 * 100, percentage2000 * 100, percentage20000 * 100)
+        else:
+            outputString = 'Plate Passed. Accuracy Summary: Negative = %.2f%%, 100 = %.2f%%, 200 = %.2f%%, 2000 = %.2f%%, 20000 = %.2f%%, %d total repeats'% (percentageNeg * 100, percentage100 * 100, percentage200 * 100, percentage2000 * 100, percentage20000 * 100, totalRepeats)
+
+    return outputString, platePassed
