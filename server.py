@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from uniformityValidationMethod import uniformityValidationMethod, uniformityEvaluationSummary
 from accuracyValidationMethod import accuracyValidationMethod_96
-from checkerBoardValidationMethod import checkerBoardValidationMethod, checkerBoardEvaluationSummary
+from checkerBoardValidationMethod import checkerBoardValidationMethod, checkerBoardEvaluation, checkerBoardEvaluation96Helper, checkerBoardEvaluation384Helper
 # Set web files folder and optionally specify which file types to check for eel.expose()
 #   *Default allowed_extensions are: ['.js', '.html', '.txt', '.htm', '.xhtml']
 eel.init('web')
@@ -43,7 +43,6 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
             mapAcc = javascriptAccuracyMap2Dataframe(np.resize(np.array(inputInfo), [12, 8]).T)
             SARSdf, calReddf, outputDf = accuracyValidationMethod_96(mapAcc, file = filePath)
             outputString, platePassed = accuracyEvaluationSummary(outputDf)
-            print(outputDf)
             popUpSaveNotSplit(outputDf)
             return SARSdf.to_json(), calReddf.to_json(), outputString, platePassed
 
@@ -64,7 +63,7 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
 
         elif textPlateType == 384:
             if textQuadrantSplitType == "No":
-                SARSdf, calReddf, outputDf = uniformityValidationMethod(file = filePath, input384 = False)
+                SARSdf, calReddf, outputDf = uniformityValidationMethod(file = filePath, input384 = True) # input384 param doesnt matter
                 outputString, platePassed = uniformityEvaluationSummary(SARSdf, calReddf)
                 popUpSaveNotSplit(outputDf)
                 return SARSdf.to_json(), calReddf.to_json(), outputString, platePassed
@@ -76,20 +75,19 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
     elif textValidationType == 'Checkerboard':
         if textPlateType == 96:
             SARSdf, calReddf, outputDf = checkerBoardValidationMethod(file = filePath, input384 = False)
-            outputString, platePassed = checkerBoardEvaluationSummary(SARSdf, calReddf)
+            controlsPassed, numFailsNeg, numFailsPos, numRepeats = checkerBoardEvaluation96Helper(SARSdf, calReddf)
+            outputString, platePassed = checkerBoardEvaluation(controlsPassed, numFailsNeg, numFailsPos, numRepeats)
             popUpSaveNotSplit(outputDf)
             return SARSdf.to_json(), calReddf.to_json(), outputString, platePassed
 
         elif textPlateType == 384:
             if textQuadrantSplitType == "No":
                 print('FIXME: Run python Checkerboard 384 method')
-                SARSdf, calReddf, outputDf = checkerBoardValidationMethod(file = filePath, input384 = False)
-                # outputString, platePassed = uniformityEvaluationSummary(SARSdf, calReddf)
-                # popUpSaveNotSplit(outputDf)
-                print(SARSdf)
-                print(calReddf)
-                print(outputDf)
-                return SARSdf.to_json(), calReddf.to_json(), "filler", True
+                SARSdf, calReddf, outputDf = checkerBoardValidationMethod(file = filePath, input384 = True) # input384 doesnt matter here
+                controlsPassed, numFailsNeg, numFailsPos, numRepeats = checkerBoardEvaluation384Helper(SARSdf, calReddf)
+                outputString, platePassed = checkerBoardEvaluation(controlsPassed, numFailsNeg, numFailsPos, numRepeats, input384 = True)
+                popUpSaveNotSplit(outputDf)
+                return SARSdf.to_json(), calReddf.to_json(), outputString, platePassed
             elif textQuadrantSplitType == "Yes":
                 print('FIXME: Run python Checkerboard 384 method with Quadrants split')
     return

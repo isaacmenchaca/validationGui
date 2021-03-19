@@ -103,7 +103,7 @@ def checkerBoardValidationMethod(file: str, input384 = False, sortBy = ['Well ro
 
         return dfs_96
 
-def checkerBoardEvaluationSummary(SARSdf, calReddf, input384 = False):
+def checkerBoardEvaluation96Helper(SARSdf, calReddf):
     outputString = ""
     numRepeats = 0
     numFailsNeg = 0
@@ -111,82 +111,117 @@ def checkerBoardEvaluationSummary(SARSdf, calReddf, input384 = False):
     negativeWellsSARS = []
     negativeWellsCalRed = []
     controlsPassed = True
-    platePassed = True
 
-    if input384 == False:
-        for rowCase1, rowCase2 in zip(np.arange(0, 8, 2), np.arange(1, 8, 2)):
-            for colCase1 in np.arange(0, 12, 2):
-                if (rowCase1 == 0 or rowCase1 == 2) and colCase1 == 0:
-                    if not(np.isnan(calReddf.values[rowCase1, colCase1])):
-                        controlsPassed = False
+    for rowCase1, rowCase2 in zip(np.arange(0, 8, 2), np.arange(1, 8, 2)):
+        for colCase1 in np.arange(0, 12, 2):
+            if (rowCase1 == 0 or rowCase1 == 2) and colCase1 == 0:
+                if not(np.isnan(calReddf.values[rowCase1, colCase1])):
+                    controlsPassed = False
 
-                    if not((np.isnan(SARSdf.values[rowCase1, colCase1])) or (SARSdf.values[rowCase1, colCase1] >= 40)):
-                        controlsPassed = False
-                else:
-                    if not (np.isnan(SARSdf.values[rowCase1, colCase1]) or (SARSdf.values[rowCase1, colCase1] >= 40)):
-                        if SARSdf.values[rowCase1, colCase1] >= 36: # repeat
-                            numRepeats +=1
-                        else:
-                            numFailsNeg += 1
+                if not((np.isnan(SARSdf.values[rowCase1, colCase1])) or (SARSdf.values[rowCase1, colCase1] >= 40)):
+                    controlsPassed = False
+            else:
+                if not (np.isnan(SARSdf.values[rowCase1, colCase1]) or (SARSdf.values[rowCase1, colCase1] >= 40)):
+                    if SARSdf.values[rowCase1, colCase1] >= 36: # repeat
+                        numRepeats +=1
+                    else:
+                        numFailsNeg += 1
 
-                negativeWellsSARS.append(SARSdf.values[rowCase1, colCase1])
-                negativeWellsCalRed.append(calReddf.values[rowCase1, colCase1])
+            negativeWellsSARS.append(SARSdf.values[rowCase1, colCase1])
+            negativeWellsCalRed.append(calReddf.values[rowCase1, colCase1])
 
-            for colCase2 in np.arange(1, 12, 2):
-                if not (np.isnan(SARSdf.values[rowCase2, colCase2]) or (SARSdf.values[rowCase2, colCase2] >= 40)):
-                        if SARSdf.values[rowCase2, colCase2] >= 36: # repeat
-                            numRepeats +=1
-                        else:
-                            numFailsNeg += 1
+        for colCase2 in np.arange(1, 12, 2):
+            if not (np.isnan(SARSdf.values[rowCase2, colCase2]) or (SARSdf.values[rowCase2, colCase2] >= 40)):
+                    if SARSdf.values[rowCase2, colCase2] >= 36: # repeat
+                        numRepeats +=1
+                    else:
+                        numFailsNeg += 1
 
-                negativeWellsSARS.append(SARSdf.values[rowCase2, colCase2])
-                negativeWellsCalRed.append(calReddf.values[rowCase2, colCase2])
+            negativeWellsSARS.append(SARSdf.values[rowCase2, colCase2])
+            negativeWellsCalRed.append(calReddf.values[rowCase2, colCase2])
 
 
-        positiveWellsSARS = []
-        positiveWellsCalRed = []
-        for rowCase1, rowCase2 in zip(np.arange(0, 8, 2), np.arange(1, 8, 2)):
-            for colCase2 in np.arange(0, 12, 2):
-                if (rowCase2 == 0 or rowCase2 == 2) and colCase2 == 0:
-                    if (np.isnan(calReddf.values[rowCase2, colCase2])):
-                        print('Controls Failed.')
-                        controlsPassed = False
+    positiveWellsSARS = []
+    positiveWellsCalRed = []
+    for rowCase1, rowCase2 in zip(np.arange(0, 8, 2), np.arange(1, 8, 2)):
+        for colCase2 in np.arange(0, 12, 2):
+            if (rowCase2 == 0 or rowCase2 == 2) and colCase2 == 0:
+                if (np.isnan(calReddf.values[rowCase2, colCase2])):
+                    print('Controls Failed.')
+                    controlsPassed = False
 
-                    if (np.isnan(SARSdf.values[rowCase2, colCase2])) or (SARSdf.values[rowCase2, colCase2] >= 40):
-                        print('Controls Failed.')
-                        controlsPassed = False
+                if (np.isnan(SARSdf.values[rowCase2, colCase2])) or (SARSdf.values[rowCase2, colCase2] >= 40):
+                    print('Controls Failed.')
+                    controlsPassed = False
 
-                if np.isnan(SARSdf.values[rowCase2, colCase2]) or SARSdf.values[rowCase2, colCase2] >= 40:
+            if np.isnan(SARSdf.values[rowCase2, colCase2]) or SARSdf.values[rowCase2, colCase2] >= 40:
                     # print("Fail", SARSdf.values[rowCase2, colCase2])
-                    numFailsPos += 1
+                numFailsPos += 1
 
 
-                positiveWellsSARS.append(SARSdf.values[rowCase2, colCase2])
-                positiveWellsCalRed.append(calReddf.values[rowCase2, colCase2])
+            positiveWellsSARS.append(SARSdf.values[rowCase2, colCase2])
+            positiveWellsCalRed.append(calReddf.values[rowCase2, colCase2])
 
-            for colCase1 in np.arange(1, 12, 2):
+        for colCase1 in np.arange(1, 12, 2):
 
-                if np.isnan(SARSdf.values[rowCase1, colCase1]) or SARSdf.values[rowCase1, colCase1] >= 40:
-                    numFailsPos += 1
+            if np.isnan(SARSdf.values[rowCase1, colCase1]) or SARSdf.values[rowCase1, colCase1] >= 40:
+                numFailsPos += 1
                     # print("Fail", SARSdf.values[rowCase1, colCase1])
 
-                positiveWellsSARS.append(SARSdf.values[rowCase1, colCase1])
-                positiveWellsCalRed.append(calReddf.values[rowCase1, colCase1])
+            positiveWellsSARS.append(SARSdf.values[rowCase1, colCase1])
+            positiveWellsCalRed.append(calReddf.values[rowCase1, colCase1])
+
+    return controlsPassed, numFailsNeg, numFailsPos, numRepeats
 
 
-        percentageNeg = (46 - numFailsNeg) * 100 / 46
-        percentagePos = (46 - numFailsPos) * 100 / 46
+#####3
+def checkerBoardEvaluation384Helper(SARSdf, calReddf):
+    print("This will call 96 helper four times.")
+    sarsQUAD1_96, sarsQUAD2_96, sarsQUAD3_96, sarsQUAD4_96 = quadrants384_to_96(SARSdf)
+    calQUAD1_96, calQUAD2_96, calQUAD3_96, calQUAD4_96 = quadrants384_to_96(calReddf)
 
-        if controlsPassed and percentageNeg >= 95 and percentagePos >= 95: # PASS CRITERIA
-            if numRepeats == 0:
-                outputString = "Plate Passed. Checkerboard Summary: Negative = %.2f%% (%d/ 46), Positive = %.2f%% (%d/ 46)." % (percentageNeg, 46 - numFailsNeg, percentagePos, 46 - numFailsPos)
-            else:
-                outputString = "Plate Passed. Checkerboard Summary: Negative = %.2f%% (%d/ 46), Positive = %.2f%% (%d/ 46), Total Repeats = %d." % (percentageNeg, 46 - numFailsNeg, percentagePos, 46 - numFailsPos, numRepeats)
+    sarsQuads = [sarsQUAD1_96, sarsQUAD2_96, sarsQUAD3_96, sarsQUAD4_96]
+    calQuads = [calQUAD1_96, calQUAD2_96, calQUAD3_96, calQUAD4_96]
 
+    allControlsPassed = True
+    totalNumFailsNeg = 0
+    totalNumFailsPos = 0
+    totalNumRepeats = 0
+
+    for sars, calRed in zip(sarsQuads, calQuads):
+        controlsPassed, numFailsNeg, numFailsPos, numRepeats = checkerBoardEvaluation96Helper(sars, calRed)
+        allControlsPassed = allControlsPassed and controlsPassed
+        totalNumFailsNeg += numFailsNeg
+        totalNumFailsPos += numFailsPos
+        totalNumRepeats += numRepeats
+
+    return allControlsPassed, totalNumFailsNeg, totalNumFailsPos, totalNumRepeats
+
+
+def checkerBoardEvaluation(controlsPassed, numFailsNeg, numFailsPos, numRepeats, input384 = False):
+    totalSampleEach = 0
+    platePassed = True
+
+    if input384 == False: # 96 test
+        totalSampleEach = 46
+        percentageNeg = (totalSampleEach - numFailsNeg) * 100 / totalSampleEach
+        percentagePos = (totalSampleEach - numFailsPos) * 100 / totalSampleEach
+    elif input384 == True: # 96 test
+        totalSampleEach = 184
+        percentageNeg = (totalSampleEach - numFailsNeg) * 100 / totalSampleEach
+        percentagePos = (totalSampleEach - numFailsPos) * 100 / totalSampleEach
+
+    if controlsPassed and percentageNeg >= 95 and percentagePos >= 95: # PASS CRITERIA
+        if numRepeats == 0:
+            outputString = "Plate Passed. Checkerboard Summary: Negative = %.2f%% (%d/ %d), Positive = %.2f%% (%d/ %d)." % (percentageNeg, totalSampleEach - numFailsNeg, totalSampleEach, percentagePos, totalSampleEach - numFailsPos, totalSampleEach)
         else:
-            if not(controlsPassed):
-                outputString = "Plate Failed. Checkerboard Summary: Controls failed. Negative = %.2f%% (%d/ 46), Positive = %.2f%% (%d/ 46)." % (percentageNeg, 46 - numFailsNeg, percentagePos, 46 - numFailsPos)
-            else:
-                outputString = "Plate Failed. Checkerboard Summary: Negative = %.2f%% (%d/ 46), Positive = %.2f%% (%d/ 46)." % (percentageNeg, 46 - numFailsNeg, percentagePos, 46 - numFailsPos)
-            platePassed = False
+            outputString = "Plate Passed. Checkerboard Summary: Negative = %.2f%% (%d/ %d), Positive = %.2f%% (%d/ %d), Total Repeats = %d." % (percentageNeg, totalSampleEach - numFailsNeg, totalSampleEach, percentagePos, totalSampleEach - numFailsPos, totalSampleEach,numRepeats)
+
+    else:
+        if not(controlsPassed):
+            outputString = "Plate Failed. Checkerboard Summary: Controls failed. Negative = %.2f%% (%d/ %d), Positive = %.2f%% (%d/ %d)." % (percentageNeg, totalSampleEach - numFailsNeg, totalSampleEach, percentagePos, totalSampleEach - numFailsPos, totalSampleEach)
+        else:
+            outputString = "Plate Failed. Checkerboard Summary: Negative = %.2f%% (%d/ %d), Positive = %.2f%% (%d/ %d)." % (percentageNeg, totalSampleEach - numFailsNeg, totalSampleEach, percentagePos, totalSampleEach - numFailsPos, totalSampleEach)
+        platePassed = False
+
     return outputString, platePassed
