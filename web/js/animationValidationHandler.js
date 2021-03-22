@@ -328,6 +328,7 @@ function makeOutputHeatMap(sarsDfasObj, divPlacement, heatMapID, outputAccuracyS
 //---------------------------------------------------------------------------------------------------
 function makeOutputHeatMap384(sarsDfasObj, divPlacement, heatMapID, outputAccuracySummaryString, platePassed){
     $(divPlacement).empty()
+    // $('.pageNavQuads').empty()
 
     let rows = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"];
     let columns = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
@@ -448,7 +449,6 @@ function makeOutputHeatMap384(sarsDfasObj, divPlacement, heatMapID, outputAccura
                 for (var columnCount = 1; columnCount <= 24; columnCount++) {
                   for (var rowCount = 0; rowCount < 16; rowCount++) {
                     let wellId =  rows[rowCount] + columns[columnCount - 1]
-                    // console.log(wellId)
 
                     d3.select("#"+heatMapID).selectAll("wellPositions") //heatMapGrid2
                       .data([sarsDfasObj])
@@ -519,13 +519,39 @@ async function onClickChooseFileButton(){
    }
 }
 //---------------------------------------------------------------------------------------------------
-// async function saveFileDialog(){
-//   var saveFilePath = await eel.popUpSaveNotSplit()();
-//   console.log(typeof(saveFilePath))
-//   if (saveFilePath) {
-//     console.log(saveFilePath);
-//   }
-// }
+
+function addPageNav2HeatMapCarousel(sarsDfasObjQuads, calRedDfasObjQuads, outputSummaryString, platePassed){
+  // work on fresh start
+   $('.sarsDivPlacement').empty()
+   $('.calRedDivPlacement').empty()
+   $('.pageNavQuads').empty()
+
+   $('.hud').append($("<nav/>").addClass("pageNavQuads").attr({"aria-label": "Page navigation"})
+                                  .append($("<ul/>").addClass("pagination justify-content-center").attr({"style": "padding-top: 20%;"})
+                                          .append($("<li/>").addClass("page-item shadow-sm")
+                                                  .append($("<a/>").addClass("page-link").attr({"href": "#"}).html("1").click(function(){makeOutputHeatMap(sarsDfasObjQuads[0], ".sarsDivPlacement", "heatMapGrid", outputSummaryString[0], platePassed[0]);
+                                                                                                                                         makeOutputHeatMap(calRedDfasObjQuads[0], ".calRedDivPlacement", "heatMapGrid2", outputSummaryString[0], platePassed[0])})
+                                                         )
+                                                  )
+                                          .append($("<li/>").addClass("page-item shadow-sm")
+                                                  .append($("<a/>").addClass("page-link").attr({"href": "#"}).html("2").click(function(){makeOutputHeatMap(sarsDfasObjQuads[1], ".sarsDivPlacement", "heatMapGrid", outputSummaryString[1], platePassed[1]);
+                                                                                                                                         makeOutputHeatMap(calRedDfasObjQuads[1], ".calRedDivPlacement", "heatMapGrid2", outputSummaryString[1], platePassed[1])})
+                                                          )
+                                                  )
+                                          .append($("<li/>").addClass("page-item shadow-sm")
+                                                  .append($("<a/>").addClass("page-link").attr({"href": "#"}).html("3").click(function(){makeOutputHeatMap(sarsDfasObjQuads[2], ".sarsDivPlacement", "heatMapGrid", outputSummaryString[2], platePassed[2]);
+                                                                                                                                         makeOutputHeatMap(calRedDfasObjQuads[2], ".calRedDivPlacement", "heatMapGrid2", outputSummaryString[2], platePassed[2])})
+                                                          )
+                                                 )
+                                          .append($("<li/>").addClass("page-item shadow-sm")
+                                                  .append($("<a/>").addClass("page-link").attr({"href": "#"}).html("4").click(function(){makeOutputHeatMap(sarsDfasObjQuads[3], ".sarsDivPlacement", "heatMapGrid", outputSummaryString[3], platePassed[3]);
+                                                                                                                                         makeOutputHeatMap(calRedDfasObjQuads[3], ".calRedDivPlacement", "heatMapGrid2", outputSummaryString[3], platePassed[3])})
+                                                         )
+                                                 )
+                                          )
+                                )
+}
+
 
 //---------------------------------------------------------------------------------------------------
 async function onClickGoButton(){
@@ -540,11 +566,13 @@ async function onClickGoButton(){
 
     if (textValidationType == "Accuracy" && textPlateType == 96){ // ACCURACY 96
       // make modal pop up here.
+      $('.pageNavQuads').empty()
       $('#inputMapModal').modal("show")
       initialPlateMap()
       $('#plateMapSubmit').click(function(){compareMapButton()})
     }
     else if (textValidationType == "Uniformity" && textPlateType == 96){ // UNIFORMITY 96
+      $('.pageNavQuads').empty()
       let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)();
       let sarsDfasObj = JSON.parse(dataFromPython[0]);
       let calRedDfasObj = JSON.parse(dataFromPython[1]);
@@ -565,6 +593,7 @@ async function onClickGoButton(){
     }
 
     else if (textValidationType == "Uniformity" && textPlateType == 384 && textQuadrantSplitType == "No"){
+      $('.pageNavQuads').empty()
       let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)();
       let sarsDfasObj = JSON.parse(dataFromPython[0])
       let calRedDfasObj = JSON.parse(dataFromPython[1])
@@ -572,36 +601,42 @@ async function onClickGoButton(){
       let platePassed = dataFromPython[3]
 
       if (!jQuery.isEmptyObject(sarsDfasObj)){
-        console.log(sarsDfasObj)
         makeOutputHeatMap384(sarsDfasObj, ".sarsDivPlacement", "heatMapGrid", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
       }
       if (!jQuery.isEmptyObject(calRedDfasObj)){
-        console.log(calRedDfasObj)
         makeOutputHeatMap384(calRedDfasObj, ".calRedDivPlacement", "heatMapGrid2", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
       }
     }
 
+    else if (textValidationType == "Uniformity" && textPlateType == 384 && textQuadrantSplitType == "Yes"){
+       // pass in data as a 384 nonsplit uniformity and grab the data
+       let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)();
+       let sarsDfasObjQuads = [JSON.parse(dataFromPython[0]), JSON.parse(dataFromPython[1]), JSON.parse(dataFromPython[2]), JSON.parse(dataFromPython[3])]
+       let calRedDfasObjQuads = [JSON.parse(dataFromPython[4]), JSON.parse(dataFromPython[5]), JSON.parse(dataFromPython[6]), JSON.parse(dataFromPython[7])]
+       let outputAccuracySummaryString = [dataFromPython[8], dataFromPython[9], dataFromPython[10], dataFromPython[11]]
+       let platePassed = [dataFromPython[12], dataFromPython[13], dataFromPython[14], dataFromPython[15]]
+
+       addPageNav2HeatMapCarousel(sarsDfasObjQuads, calRedDfasObjQuads, outputAccuracySummaryString, platePassed)
+    }
+
     else if (textValidationType == "Checkerboard" && textPlateType == 96){
+      $('.pageNavQuads').empty()
       let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)();
       let sarsDfasObj = JSON.parse(dataFromPython[0]);
       let calRedDfasObj = JSON.parse(dataFromPython[1]);
       let outputAccuracySummaryString = dataFromPython[2]
       let platePassed = dataFromPython[3]
 
-      console.log(outputAccuracySummaryString)
-      console.log(platePassed)
-
       if (!jQuery.isEmptyObject(sarsDfasObj)){
-        console.log(sarsDfasObj)
         makeOutputHeatMap(sarsDfasObj, ".sarsDivPlacement", "heatMapGrid", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
       }
       if (!jQuery.isEmptyObject(calRedDfasObj)){
-        console.log(calRedDfasObj)
         makeOutputHeatMap(calRedDfasObj, ".calRedDivPlacement", "heatMapGrid2", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
       }
     }
 
     else if (textValidationType == "Checkerboard" && textPlateType == 384 && textQuadrantSplitType == "No"){
+      $('.pageNavQuads').empty()
       let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)();
       let sarsDfasObj = JSON.parse(dataFromPython[0])
       let calRedDfasObj = JSON.parse(dataFromPython[1])
@@ -610,11 +645,9 @@ async function onClickGoButton(){
       let platePassed = dataFromPython[3]
 
       if (!jQuery.isEmptyObject(sarsDfasObj)){
-        console.log(sarsDfasObj)
         makeOutputHeatMap384(sarsDfasObj, ".sarsDivPlacement", "heatMapGrid", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
       }
       if (!jQuery.isEmptyObject(calRedDfasObj)){
-        console.log(calRedDfasObj)
         makeOutputHeatMap384(calRedDfasObj, ".calRedDivPlacement", "heatMapGrid2", outputAccuracySummaryString, platePassed)  //input .sarsDivPlacement,heatMapGrid
       }
     }

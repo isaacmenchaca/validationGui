@@ -87,18 +87,18 @@ def uniformityValidationMethod(file: str, input384 = False,
 
     # focus on this part after for 384 split quadrants!!
     elif quadrants384_to_96Method == True:
-        dfs_96 = []
-
         sarsQUAD1_96, sarsQUAD2_96, sarsQUAD3_96, sarsQUAD4_96 = quadrants384_to_96(sarsdf)
         redQUAD1_96, redQUAD2_96, redQUAD3_96, redQUAD4_96 = quadrants384_to_96(REDdf)
-
+        sarsdf = [sarsQUAD1_96, sarsQUAD2_96, sarsQUAD3_96, sarsQUAD4_96]
+        REDdf = [redQUAD1_96, redQUAD2_96, redQUAD3_96, redQUAD4_96]
+        dfs_96 = []
         for sars, red in zip([sarsQUAD1_96, sarsQUAD2_96, sarsQUAD3_96, sarsQUAD4_96],
                             [redQUAD1_96, redQUAD2_96, redQUAD3_96, redQUAD4_96]):
 
             dfs_96.append(uniformitySetUp(sars, red, input384 = False).round(decimals = 2))
 
 
-        return sarsdf, REDdf#dfs_96
+        return sarsdf, REDdf, dfs_96
 
 def uniformityEvaluationSummary(SARSdf, calReddf):
     SARSdfMean = SARSdf.values.mean()

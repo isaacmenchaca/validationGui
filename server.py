@@ -75,6 +75,23 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
 
             elif textQuadrantSplitType == "Yes":
                 print('FIXME: Run python Uniformity 384 method with Quadrants split')
+                SARSdf, calReddf, outputDf = uniformityValidationMethod(file = filePath, input384 = True, quadrants384_to_96Method = True)
+
+                outputString = []
+                platePassed = []
+
+                for sars, cal in zip(SARSdf, calReddf):
+                    output, plate = uniformityEvaluationSummary(sars, cal)
+                    outputString.append(output)
+                    platePassed.append(plate)
+
+                print(outputString)
+
+                return SARSdf[0].to_json(), SARSdf[1].to_json(), SARSdf[2].to_json(), SARSdf[3].to_json(), \
+                        calReddf[0].to_json(), calReddf[1].to_json(), calReddf[2].to_json(), calReddf[3].to_json(), \
+                         outputString[0], outputString[1], outputString[2], outputString[3],\
+                          platePassed[0], platePassed[1], platePassed[2], platePassed[3]
+
 
 #-->>>>>>>>>>>>>>
     elif textValidationType == 'Checkerboard':
