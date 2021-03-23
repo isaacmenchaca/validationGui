@@ -74,9 +74,7 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
 #-->>>>>>>>>>>>>>
 
             elif textQuadrantSplitType == "Yes":
-                print('FIXME: Run python Uniformity 384 method with Quadrants split')
                 SARSdf, calReddf, outputDf = uniformityValidationMethod(file = filePath, input384 = True, quadrants384_to_96Method = True)
-
                 outputString = []
                 platePassed = []
 
@@ -84,8 +82,6 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
                     output, plate = uniformityEvaluationSummary(sars, cal)
                     outputString.append(output)
                     platePassed.append(plate)
-
-                print(outputString)
 
                 return SARSdf[0].to_json(), SARSdf[1].to_json(), SARSdf[2].to_json(), SARSdf[3].to_json(), \
                         calReddf[0].to_json(), calReddf[1].to_json(), calReddf[2].to_json(), calReddf[3].to_json(), \
@@ -109,8 +105,24 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
                 outputString, platePassed = checkerBoardEvaluation(controlsPassed, numFailsNeg, numFailsPos, numRepeats, input384 = True)
                 popUpSaveNotSplit(outputDf)
                 return SARSdf.to_json(), calReddf.to_json(), outputString, platePassed
+
             elif textQuadrantSplitType == "Yes":
                 print('FIXME: Run python Checkerboard 384 method with Quadrants split')
+                SARSdf, calReddf, outputDf = checkerBoardValidationMethod(file = filePath, input384 = True, quadrants384_to_96Method = True)
+                outputString = []
+                platePassed = []
+
+                for sars, cal in zip(SARSdf, calReddf):
+                    controlsPassed, numFailsNeg, numFailsPos, numRepeats = checkerBoardEvaluation96Helper(sars, cal)
+                    output, plate = checkerBoardEvaluation(controlsPassed, numFailsNeg, numFailsPos, numRepeats)
+                    outputString.append(output)
+                    platePassed.append(plate)
+
+                return SARSdf[0].to_json(), SARSdf[1].to_json(), SARSdf[2].to_json(), SARSdf[3].to_json(), \
+                        calReddf[0].to_json(), calReddf[1].to_json(), calReddf[2].to_json(), calReddf[3].to_json(), \
+                         outputString[0], outputString[1], outputString[2], outputString[3],\
+                          platePassed[0], platePassed[1], platePassed[2], platePassed[3]
+
     return
 
 def javascriptAccuracyMap2Dataframe(jsInputData):

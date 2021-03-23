@@ -93,15 +93,13 @@ def checkerBoardValidationMethod(file: str, input384 = False, sortBy = ['Well ro
     elif quadrants384_to_96Method == True:
         sarsQUAD1_96, sarsQUAD2_96, sarsQUAD3_96, sarsQUAD4_96 = quadrants384_to_96(FAMdf)
         redQUAD1_96, redQUAD2_96, redQUAD3_96, redQUAD4_96 = quadrants384_to_96(REDdf)
-
-
+        sarsdf = [sarsQUAD1_96, sarsQUAD2_96, sarsQUAD3_96, sarsQUAD4_96]
+        REDdf = [redQUAD1_96, redQUAD2_96, redQUAD3_96, redQUAD4_96]
         dfs_96 = []
         for sars, red in zip([sarsQUAD1_96, sarsQUAD2_96, sarsQUAD3_96, sarsQUAD4_96],
                             [redQUAD1_96, redQUAD2_96, redQUAD3_96, redQUAD4_96]):
             dfs_96.append(checkerSetUp(sars, red, input384 = False, sortBy = sortBy))
-
-
-        return dfs_96
+        return sarsdf, REDdf, dfs_96
 
 def checkerBoardEvaluation96Helper(SARSdf, calReddf):
     outputString = ""

@@ -609,7 +609,6 @@ async function onClickGoButton(){
     }
 
     else if (textValidationType == "Uniformity" && textPlateType == 384 && textQuadrantSplitType == "Yes"){
-       // pass in data as a 384 nonsplit uniformity and grab the data
        let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)();
        let sarsDfasObjQuads = [JSON.parse(dataFromPython[0]), JSON.parse(dataFromPython[1]), JSON.parse(dataFromPython[2]), JSON.parse(dataFromPython[3])]
        let calRedDfasObjQuads = [JSON.parse(dataFromPython[4]), JSON.parse(dataFromPython[5]), JSON.parse(dataFromPython[6]), JSON.parse(dataFromPython[7])]
@@ -651,6 +650,19 @@ async function onClickGoButton(){
         makeOutputHeatMap384(calRedDfasObj, ".calRedDivPlacement", "heatMapGrid2", outputAccuracySummaryString, platePassed)  //input .sarsDivPlacement,heatMapGrid
       }
     }
+
+
+    else if (textValidationType == "Checkerboard" && textPlateType == 384 && textQuadrantSplitType == "Yes"){
+         $('.pageNavQuads').empty()
+         let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)();
+         let sarsDfasObjQuads = [JSON.parse(dataFromPython[0]), JSON.parse(dataFromPython[1]), JSON.parse(dataFromPython[2]), JSON.parse(dataFromPython[3])]
+         let calRedDfasObjQuads = [JSON.parse(dataFromPython[4]), JSON.parse(dataFromPython[5]), JSON.parse(dataFromPython[6]), JSON.parse(dataFromPython[7])]
+         let outputAccuracySummaryString = [dataFromPython[8], dataFromPython[9], dataFromPython[10], dataFromPython[11]]
+         let platePassed = [dataFromPython[12], dataFromPython[13], dataFromPython[14], dataFromPython[15]]
+
+         addPageNav2HeatMapCarousel(sarsDfasObjQuads, calRedDfasObjQuads, outputAccuracySummaryString, platePassed)
+      }
+
 
 
   }
