@@ -22,17 +22,29 @@ def pythonGoButtonClicked():
     return filePath
 
 def popUpSaveNotSplit(outputDf, mapAcc = None, accuracy = False):
-    print('Pop up')
     root = tk.Tk()
     root.attributes('-topmost', 1)
     root.withdraw()
     filePath = filedialog.asksaveasfile(mode='a', defaultextension = '.xlsx')
     root.destroy()
+
     if filePath:
         outputDf.to_excel(filePath.name)
         if accuracy != False:
             mapAcc.to_excel(filePath.name[:-5] +'_AccuracyMap.xlsx')
             return filePath, mapAcc
+    return filePath
+
+def popUpSaveSplit(outputDf):
+    root = tk.Tk()
+    root.attributes('-topmost', 1)
+    root.withdraw()
+    filePath = filedialog.asksaveasfile(mode='a', defaultextension = '.xlsx')
+    root.destroy()
+
+    if filePath:
+        for i, out in enumerate(outputDf):
+            out.to_excel(filePath.name[:-5] + "_Quadrant" + str(i + 1) + ".xlsx")
     return filePath
 
 
@@ -82,7 +94,7 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
                     output, plate = uniformityEvaluationSummary(sars, cal)
                     outputString.append(output)
                     platePassed.append(plate)
-
+                popUpSaveSplit(outputDf)
                 return SARSdf[0].to_json(), SARSdf[1].to_json(), SARSdf[2].to_json(), SARSdf[3].to_json(), \
                         calReddf[0].to_json(), calReddf[1].to_json(), calReddf[2].to_json(), calReddf[3].to_json(), \
                          outputString[0], outputString[1], outputString[2], outputString[3],\
@@ -107,7 +119,6 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
                 return SARSdf.to_json(), calReddf.to_json(), outputString, platePassed
 
             elif textQuadrantSplitType == "Yes":
-                print('FIXME: Run python Checkerboard 384 method with Quadrants split')
                 SARSdf, calReddf, outputDf = checkerBoardValidationMethod(file = filePath, input384 = True, quadrants384_to_96Method = True)
                 outputString = []
                 platePassed = []
@@ -117,7 +128,7 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
                     output, plate = checkerBoardEvaluation(controlsPassed, numFailsNeg, numFailsPos, numRepeats)
                     outputString.append(output)
                     platePassed.append(plate)
-
+                popUpSaveSplit(outputDf)
                 return SARSdf[0].to_json(), SARSdf[1].to_json(), SARSdf[2].to_json(), SARSdf[3].to_json(), \
                         calReddf[0].to_json(), calReddf[1].to_json(), calReddf[2].to_json(), calReddf[3].to_json(), \
                          outputString[0], outputString[1], outputString[2], outputString[3],\
