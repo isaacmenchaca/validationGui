@@ -108,6 +108,35 @@ function initialPlateMap(){
   }
 }
 
+
+function initialPlateMap384(){
+  $("#inputPlate").empty()
+
+  $("#inputPlate").append($("<div/>").addClass("carousel slide").attr({"id": "AccurMapCarouselIndicators", "data-ride":"carousel"})
+                    .append($("<ol/>").addClass("carousel-indicators")
+                                      .append($("<li/>").addClass("active").attr({"data-target":"AccurMapCarouselIndicators", "data-slide-to": "0"}))
+                                      .append($("<li/>").attr({"data-target":"AccurMapCarouselIndicators", "data-slide-to": "1"}))
+                            )
+                    .append($("<div/>").addClass("carousel-inner")
+                                       .append($("<div/>").addClass("carousel-item active map1")
+                                                          .append($("<div/>").addClass("tooltip")))
+                                       .append($("<div/>").addClass("carousel-item map2")
+                                                          .append($("<div/>").addClass("tooltip")))
+                                       // .append($("<div/>").addClass("carousel-item map3")
+                                       //                    .append($("<div/>").addClass("tooltip")))
+                                       // .append($("<div/>").addClass("carousel-item map4")
+                                       //                    .append($("<div/>").addClass("tooltip")))
+                           )
+                    .append($("<a/>").addClass("carousel-control-prev").attr({"href":"#AccurMapCarouselIndicators", "role":"button", "data-slide":"prev"})
+                                     .append($("<span/>").addClass("carousel-control-prev-icon").attr({"aria-hidden": "true"}))
+                           )
+                    .append($("<a/>").addClass("carousel-control-next").attr({"href":"#AccurMapCarouselIndicators", "role":"button", "data-slide":"next"})
+                                      .append($("<span/>").addClass("carousel-control-next-icon").attr({"aria-hidden": "true"}))
+                           )
+                          )
+}
+
+
 //---------------------------------------------------------------------------------------------------
 function changeWellColor(wellPosID, rowCount, columnCount){
               // console.log(wellPos)
@@ -571,6 +600,15 @@ async function onClickGoButton(){
       initialPlateMap()
       $('#plateMapSubmit').click(function(){compareMapButton()})
     }
+
+    else if (textValidationType == "Accuracy" && textPlateType == 384 && textQuadrantSplitType == "No"){
+      $('.pageNavQuads').empty()
+      $('#inputMapModal').modal("show")
+      initialPlateMap384()
+
+      // WORK HERE
+    }
+
     else if (textValidationType == "Uniformity" && textPlateType == 96){ // UNIFORMITY 96
       $('.pageNavQuads').empty()
       let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath)();
