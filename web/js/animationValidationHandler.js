@@ -108,10 +108,97 @@ function initialPlateMap(){
   }
 }
 
+// #############################################################################################################################
+function makeQuadPlateMap(className, quadNum){
+  // Labels of row and columns and size of the SVG
+  var rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
+  var columns = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+  var margin = {top: 30, right: 30, bottom: 30, left: 30};
+  var width = (125 * 5) - margin.left - margin.right;
+  var height = (82 * 5) - margin.top - margin.bottom;
+
+  // SVG template
+  var svg = d3.select(className)
+                .append("svg")
+                .attr("id", "inGridSvg" + quadNum)
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("id", "inGrid" + quadNum)
+                .attr("transform", "translate("+margin.left+","+margin.top+")");
+
+
+  // you have to have an x and y variable for array/ matrices.
+  // Build X scales and axis:
+  var x = d3.scaleBand() // just a scale
+              .domain(columns) // represents matrix location
+              .range([0, width])
+              .padding(0.01)
+
+
+  // Build Y scales and axis:
+  var y = d3.scaleBand() // just a scale
+              .domain(rows) // domain is 8, represents matrix location
+              .range([0, height]) // divides domain up by this much?
+              .padding(0.01)
+
+  // SVG generate X axis
+  // svg.append("g").attr("transform", "translate(0,"+height+")").call(d3.axisBottom(x));
+  svg.append("g")
+            .attr("transform", "translate(0, -2)") // this was for the distance between the axis line
+            .call(d3.axisTop(x).tickSize([0, 0]))
+            .call(g => g.select(".domain").remove()) // to remove the ticks (lines of the ticks)
+            .attr("class", "axis");
+  // SVG generate Y axis
+  svg.append("g")
+            .attr("transform", "translate(-2, 0)")
+            .call(d3.axisLeft(y).tickSize([0, 0]))
+            .call(g => g.select(".domain").remove())
+            .attr("class", "axis");
+
+  $(className).append($("<h5/>").html("Quadrant " + quadNum).attr({"style": "text-align: center;"}))
+  //Read the data
+
+  for(var columnCount=0; columnCount<12; columnCount++){
+    for(var rowCount=0; rowCount<8; rowCount++){
+      var idWell = rows[rowCount] + columns[columnCount]
+      if (!controlAndNaNWells.includes(idWell)){
+      d3.select("#inGrid" + quadNum)
+            .append("rect").on("click", function(){changeWellColor384($(this).attr("id"), $(this).attr("class"))})
+            .attr("x", function() { return x(columns[columnCount]) }) // x(columns[columnCount]). inputting columns[columnCount] into var x which is a built in function of d3.
+            // var x is now being sliced by columns[columnCount] with this function x.
+            // "x" is a css attribute.
+            .attr("y", function() { return y(rows[rowCount]) })
+            // var y is now being sliced by columns[columnCount] with this function y.
+            // "y" is a css attribute.
+            .attr("id", idWell)
+            .attr("class", "quad" + quadNum)
+            .attr("width", x.bandwidth() ) // bandwidth is a d3 function where it automatically centers axis with cell.
+            .attr("height", y.bandwidth() ) // the length of size (170px) variable divided by domain (ex 8 rows).
+            .attr("style","fill:white;stroke:black;stroke-width:2")
+          }
+      else{
+        d3.select("#inGrid" + quadNum)
+              .append("rect")//.on("click", function(){changeWellColor($(this).attr("id"))})
+              .attr("x", function() { return x(columns[columnCount]) }) // x(columns[columnCount]). inputting columns[columnCount] into var x which is a built in function of d3.
+              // var x is now being sliced by columns[columnCount] with this function x.
+              // "x" is a css attribute.
+              .attr("y", function() { return y(rows[rowCount]) })
+              // var y is now being sliced by columns[columnCount] with this function y.
+              // "y" is a css attribute.
+              .attr("id", idWell)
+              .attr("class", "quad" + quadNum)
+              .attr("width", x.bandwidth() ) // bandwidth is a d3 function where it automatically centers axis with cell.
+              .attr("height", y.bandwidth() ) // the length of size (170px) variable divided by domain (ex 8 rows).
+              .attr("style","fill:grey;stroke:black;stroke-width:2")
+      }
+    }
+  }
+}
+
 
 function initialPlateMap384(){
   $("#inputPlate").empty()
-
   $("#inputPlate").append($("<div/>").addClass("carousel slide").attr({"id": "AccurMapCarouselIndicators", "data-ride":"carousel"})
                     .append($("<ol/>").addClass("carousel-indicators")
                                       .append($("<li/>").addClass("active").attr({"data-target":"AccurMapCarouselIndicators", "data-slide-to": "0"}))
@@ -122,23 +209,53 @@ function initialPlateMap384(){
                                                           .append($("<div/>").addClass("tooltip")))
                                        .append($("<div/>").addClass("carousel-item map2")
                                                           .append($("<div/>").addClass("tooltip")))
-                                       // .append($("<div/>").addClass("carousel-item map3")
-                                       //                    .append($("<div/>").addClass("tooltip")))
-                                       // .append($("<div/>").addClass("carousel-item map4")
-                                       //                    .append($("<div/>").addClass("tooltip")))
+                                       .append($("<div/>").addClass("carousel-item map3")
+                                                          .append($("<div/>").addClass("tooltip")))
+                                       .append($("<div/>").addClass("carousel-item map4")
+                                                          .append($("<div/>").addClass("tooltip")))
                            )
-                    .append($("<a/>").addClass("carousel-control-prev").attr({"href":"#AccurMapCarouselIndicators", "role":"button", "data-slide":"prev"})
-                                     .append($("<span/>").addClass("carousel-control-prev-icon").attr({"aria-hidden": "true"}))
+                    .append($("<a/>").addClass("icon384map carousel-control-prev").attr({"href":"#AccurMapCarouselIndicators", "role":"button", "data-slide":"prev"})
+                                     .append($("<span/>").addClass("icon384map carousel-control-prev-icon").attr({"aria-hidden": "true"}))
                            )
-                    .append($("<a/>").addClass("carousel-control-next").attr({"href":"#AccurMapCarouselIndicators", "role":"button", "data-slide":"next"})
-                                      .append($("<span/>").addClass("carousel-control-next-icon").attr({"aria-hidden": "true"}))
+                    .append($("<a/>").addClass("icon384map carousel-control-next").attr({"href":"#AccurMapCarouselIndicators", "role":"button", "data-slide":"next"})
+                                      .append($("<span/>").addClass("icon384map carousel-control-next-icon").attr({"aria-hidden": "true"}))
                            )
                           )
+
+  makeQuadPlateMap(".map1", 1)
+  makeQuadPlateMap(".map2", 2)
+  makeQuadPlateMap(".map3", 3)
+  makeQuadPlateMap(".map4", 4)
 }
 
 
 //---------------------------------------------------------------------------------------------------
-function changeWellColor(wellPosID, rowCount, columnCount){
+function changeWellColor384(wellPosID, className){
+              console.log(wellPosID)
+              console.log(className)
+
+
+              var currentColor = d3.select("." + className + "#" + wellPosID).style('fill')
+              console.log(currentColor)
+
+              if (currentColor == "white"){
+                d3.select("." + className + "#" + wellPosID).style("fill", "black");
+              }
+              else if (currentColor == "black"){
+                d3.select("." + className + "#" + wellPosID).style("fill", "red");
+              }
+              else if (currentColor == "red"){
+                d3.select("." + className + "#" + wellPosID).style("fill", "blue");
+              }
+              else if (currentColor == "blue"){
+                d3.select("." + className + "#" + wellPosID).style("fill", "green");
+              }
+              else if (currentColor == "green"){
+                d3.select("." + className + "#" + wellPosID).style("fill", "white");
+              }
+}
+
+function changeWellColor(wellPosID){ //, rowCount, columnCount){
               // console.log(wellPos)
               // console.log(wellPosID)
 
