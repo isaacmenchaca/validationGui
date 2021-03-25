@@ -228,8 +228,6 @@ function initialPlateMap384(){
   makeQuadPlateMap(".map4", 4)
 }
 
-
-//---------------------------------------------------------------------------------------------------
 function changeWellColor384(wellPosID, className){
               console.log(wellPosID)
               console.log(className)
@@ -256,9 +254,6 @@ function changeWellColor384(wellPosID, className){
 }
 
 function changeWellColor(wellPosID){ //, rowCount, columnCount){
-              // console.log(wellPos)
-              // console.log(wellPosID)
-
               var currentColor = d3.select("#" + wellPosID).style('fill')
 
               if (currentColor == "white"){
@@ -283,10 +278,6 @@ async function compareMapButton(){
   var rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
   var columns = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
 
-  // $("#inGrid").forEach(function(entry) {
-  //   console.log(entry);
-  // });
-
   var negCount = 0
   var cps100Count = 0
   var cps200Count = 0
@@ -295,7 +286,7 @@ async function compareMapButton(){
   var plateMapColorArray = new Array(96);
 
   $("#inGridSvg rect").each( function( index, element){ // included #inGridSvg
-     console.log(index, $(element));
+     // console.log(index, $(element));
      // d3.select("#" + wellPosID).style('fill')
      concentrationOfSpike = d3.select("#" + $(element).attr("id")).style('fill');
      if(!controlAndNaNWells.includes($(element).attr("id"))){
@@ -332,19 +323,20 @@ async function compareMapButton(){
     console.log("Pass that data.", negCount, cps100Count, cps200Count, cps2000Count, cps20000Count)
     let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath, plateMapColorArray)();
 
-
-
     let sarsDfasObj = JSON.parse(dataFromPython[0]);
     let calRedDfasObj = JSON.parse(dataFromPython[1]);
     let outputAccuracySummaryString = dataFromPython[2]
     let platePassed = dataFromPython[3]
 
+    console.log(sarsDfasObj)
+    console.log(calRedDfasObj)
+    console.log(outputAccuracySummaryString)
+    console.log(platePassed)
+
     if (!jQuery.isEmptyObject(sarsDfasObj)){
-      console.log(sarsDfasObj)
       makeOutputHeatMap(sarsDfasObj, ".sarsDivPlacement", "heatMapGrid", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
     }
     if (!jQuery.isEmptyObject(calRedDfasObj)){
-      console.log(calRedDfasObj)
       makeOutputHeatMap(calRedDfasObj, ".calRedDivPlacement", "heatMapGrid2", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
     }
     $('#inputMapModal').modal("hide")
@@ -353,8 +345,85 @@ async function compareMapButton(){
     console.log("Dont pass that data.", negCount, cps100Count, cps200Count, cps2000Count, cps20000Count)
   }
 }
+// ##############################################################################
 
-//---------------------------------------------------------------------------------------------------
+async function compareMapButton384(){
+  let grid = ["#inGridSvg1", "#inGridSvg2", "#inGridSvg3", "#inGridSvg4"]
+  let plateMapColorArray384 = new Array(4);
+  let passData = true
+
+  for(var i = 0; i < grid.length; i++){
+    console.log(grid[i])
+    let negCount = 0
+    let cps100Count = 0
+    let cps200Count = 0
+    let cps2000Count = 0
+    let cps20000Count = 0
+    let plateMapColorArray = new Array(96);
+
+    $(grid[i] + " rect").each(function( index, element){ // included #inGridSvg
+       concentrationOfSpike = d3.select("." + $(this).attr("class") + "#" + $(element).attr("id")).style('fill');
+       if(!controlAndNaNWells.includes($(element).attr("id"))){
+         if (concentrationOfSpike == "white"){
+           plateMapColorArray[index] = "neg";
+           negCount += 1;
+         }
+         else if (concentrationOfSpike == "black"){
+           plateMapColorArray[index] = 100;
+           cps100Count += 1;
+         }
+         else if (concentrationOfSpike == "red"){
+           plateMapColorArray[index] = 200;
+           cps200Count += 1;
+         }
+         else if (concentrationOfSpike == "blue"){
+           plateMapColorArray[index] = 2000;
+           cps2000Count += 1;
+         }
+         else if (concentrationOfSpike == "green"){
+           plateMapColorArray[index] = 20000;
+           cps20000Count += 1;
+         }
+       }
+       else if(index < 4){
+         plateMapColorArray[index] = "control";
+       }
+       else{
+         plateMapColorArray[index] = "N/A";
+       }
+    });
+
+    if (negCount == 30 && cps100Count == 20 && cps200Count == 20 && cps2000Count == 5 && cps20000Count == 5){
+      console.log("Pass that data.", negCount, cps100Count, cps200Count, cps2000Count, cps20000Count)
+      plateMapColorArray384[i] = plateMapColorArray
+    }
+    else{
+      console.log("Don't pass that data.", negCount, cps100Count, cps200Count, cps2000Count, cps20000Count)
+      passData = false
+    }
+  }
+
+  if (passData == true) {
+    // pass 384 data with eel.
+    console.log(plateMapColorArray384)
+    let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath, plateMapColorArray384)();
+    let sarsDfasObj = JSON.parse(dataFromPython[0]);
+    let calRedDfasObj = JSON.parse(dataFromPython[1]);
+    let outputAccuracySummaryString = dataFromPython[2]
+    let platePassed = dataFromPython[3]
+
+    if (!jQuery.isEmptyObject(sarsDfasObj)){
+      makeOutputHeatMap384(sarsDfasObj, ".sarsDivPlacement", "heatMapGrid", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
+    }
+    if (!jQuery.isEmptyObject(calRedDfasObj)){
+      makeOutputHeatMap384(calRedDfasObj, ".calRedDivPlacement", "heatMapGrid2", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
+    }
+  $('#inputMapModal').modal("hide")
+  }
+
+}
+
+// ##############################################################################
 function makeOutputHeatMap(sarsDfasObj, divPlacement, heatMapID, outputAccuracySummaryString, platePassed){
     $(divPlacement).empty()
 
@@ -471,7 +540,7 @@ function makeOutputHeatMap(sarsDfasObj, divPlacement, heatMapID, outputAccuracyS
                   }
             }
 }
-//---------------------------------------------------------------------------------------------------
+
 function makeOutputHeatMap384(sarsDfasObj, divPlacement, heatMapID, outputAccuracySummaryString, platePassed){
     $(divPlacement).empty()
     // $('.pageNavQuads').empty()
@@ -712,6 +781,7 @@ async function onClickGoButton(){
 
     if (textValidationType == "Accuracy" && textPlateType == 96){ // ACCURACY 96
       // make modal pop up here.
+      $('#plateMapSubmit').unbind('click');
       $('.pageNavQuads').empty()
       $('#inputMapModal').modal("show")
       initialPlateMap()
@@ -719,11 +789,11 @@ async function onClickGoButton(){
     }
 
     else if (textValidationType == "Accuracy" && textPlateType == 384 && textQuadrantSplitType == "No"){
+      $('#plateMapSubmit').unbind('click');
       $('.pageNavQuads').empty()
       $('#inputMapModal').modal("show")
       initialPlateMap384()
-
-      // WORK HERE
+      $('#plateMapSubmit').click(function(){compareMapButton384()})
     }
 
     else if (textValidationType == "Uniformity" && textPlateType == 96){ // UNIFORMITY 96

@@ -248,19 +248,11 @@ def accuracyValidationMethod_96(mapAcc, file: str):
     accuracy_report = formatAccuracyReport(mapAcc, FAMdf, REDdf) # helper method
     return FAMdf, REDdf, accuracy_report.fillna('N/A')
 
-def accuracyValidationMethod_384(accuracyMap_Quad1: str,
-                                accuracyMap_Quad2: str,
-                                accuracyMap_Quad3: str,
-                                accuracyMap_Quad4: str,
+def accuracyValidationMethod_384(accuracyMap_Quad1,
+                                accuracyMap_Quad2,
+                                accuracyMap_Quad3,
+                                accuracyMap_Quad4,
                                 file: str, format_384: bool = False):
-
-
-    accuracyMap_Quad1 = pd.read_excel(accuracyMap_Quad1, index_col = 'Rows')
-    accuracyMap_Quad2 = pd.read_excel(accuracyMap_Quad2, index_col = 'Rows')
-    accuracyMap_Quad3 = pd.read_excel(accuracyMap_Quad3, index_col = 'Rows')
-    accuracyMap_Quad4 = pd.read_excel(accuracyMap_Quad4, index_col = 'Rows')
-
-
 
     FAMdf_384 = pd.read_excel(file)
     FAMdf_384.rename(columns={'Unnamed: 0':'Rows'}, inplace=True)
@@ -298,7 +290,7 @@ def accuracyValidationMethod_384(accuracyMap_Quad1: str,
                                                          len(accuracy_reports['Specimen Number']), dtype=int)
         accuracy_reports = pd.concat([accuracy_reports_controls, accuracy_reports])
 
-    return accuracy_reports
+    return FAMdf_384_filtered, REDdf_384_filtered, accuracy_reports
 
 def accuracyEvaluationSummary(df):
     control_filter = (df["Specimen Number"] == "Control")

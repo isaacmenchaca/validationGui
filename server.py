@@ -4,7 +4,7 @@ from tkinter import filedialog
 import numpy as np
 import pandas as pd
 from uniformityValidationMethod import uniformityValidationMethod, uniformityEvaluationSummary
-from accuracyValidationMethod import accuracyValidationMethod_96, accuracyEvaluationSummary
+from accuracyValidationMethod import accuracyValidationMethod_96, accuracyValidationMethod_384, accuracyEvaluationSummary
 from checkerBoardValidationMethod import checkerBoardValidationMethod, checkerBoardEvaluation, checkerBoardEvaluation96Helper, checkerBoardEvaluation384Helper
 # Set web files folder and optionally specify which file types to check for eel.expose()
 #   *Default allowed_extensions are: ['.js', '.html', '.txt', '.htm', '.xhtml']
@@ -21,7 +21,7 @@ def pythonGoButtonClicked():
     root.destroy()
     return filePath
 
-def popUpSaveNotSplit(outputDf, mapAcc = None, accuracy = False):
+def popUpSaveNotSplit(outputDf, mapAcc = None, accuracy = False, input384 = False):
     root = tk.Tk()
     root.attributes('-topmost', 1)
     root.withdraw()
@@ -30,8 +30,12 @@ def popUpSaveNotSplit(outputDf, mapAcc = None, accuracy = False):
 
     if filePath:
         outputDf.to_excel(filePath.name)
-        if accuracy != False:
-            mapAcc.to_excel(filePath.name[:-5] +'_AccuracyMap.xlsx')
+        if accuracy == True:
+            if input384 == True:
+                for i, map in enumerate(mapAcc):
+                    map.to_excel(filePath.name[:-5] +'_AccuracyMapQuad' + str(i + 1) + '.xlsx')
+            else:
+                mapAcc.to_excel(filePath.name[:-5] +'_AccuracyMap.xlsx')
             return filePath, mapAcc
     return filePath
 
@@ -55,7 +59,7 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
 
     if textValidationType == 'Accuracy':
         if textPlateType == 96:
-
+            print('FIXME: Run python Accuracy 96 method')
             mapAcc = javascriptAccuracyMap2Dataframe(np.resize(np.array(inputInfo), [12, 8]).T)
             SARSdf, calReddf, outputDf = accuracyValidationMethod_96(mapAcc, file = filePath)
             outputString, platePassed = accuracyEvaluationSummary(outputDf)
@@ -65,9 +69,25 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
 # -->>>>>>>>>>>>>>
         elif textPlateType == 384:
             if textQuadrantSplitType == "No":
-                print('FIXME: Run python Accuracy 384 method')
+                mapAcc384 = []
+                for input in inputInfo:
+                    mapAcc384.append(javascriptAccuracyMap2Dataframe(np.resize(np.array(inputInfo), [12, 8]).T))
+                SARSdf, calReddf, outputDf = accuracyValidationMethod_384(mapAcc384[0], mapAcc384[1], mapAcc384[2], mapAcc384[3],\
+                                                file = filePath, format_384  = True)
+                outputString, platePassed = accuracyEvaluationSummary(outputDf)
+                popUpSaveNotSplit(outputDf, mapAcc384, accuracy = True, input384 = True)
+                return SARSdf.to_json(), calReddf.to_json(), outputString, platePassed
+
             elif textQuadrantSplitType == "Yes":
                 print('FIXME: Run python Accuracy 384 method with Quadrants split')
+                mapAcc384 = []
+                for input in inputInfo:
+                    mapAcc384.append(javascriptAccuracyMap2Dataframe(np.resize(np.array(inputInfo), [12, 8]).T))
+                SARSdf, calReddf, outputDf = accuracyValidationMethod_384(mapAcc384[0], mapAcc384[1], mapAcc384[2], mapAcc384[3],\
+                                                file = filePath, format_384  = False)
+                # outputDf <-- 4 data frames
+                return 1
+
 # -->>>>>>>>>>>>>>
     elif textValidationType == 'Uniformity':
         if textPlateType == 96:
