@@ -267,9 +267,14 @@ def accuracyValidationMethod_384(accuracyMap_Quad1,
     REDdf_384 = REDdf_384[REDdf_384['Unnamed: 1'] == 'Cq']
     REDdf_384_filtered = REDdf_384.loc[:, FAMdf_384.columns != 'Unnamed: 1']
 
+    sarsQUAD1_96, sarsQUAD2_96, sarsQUAD3_96, sarsQUAD4_96 = quadrants384_to_96(FAMdf_384_filtered)
+    redQUAD1_96, redQUAD2_96, redQUAD3_96, redQUAD4_96 = quadrants384_to_96(REDdf_384_filtered)
+    sarsdf = [sarsQUAD1_96, sarsQUAD2_96, sarsQUAD3_96, sarsQUAD4_96]
+    REDdf = [redQUAD1_96, redQUAD2_96, redQUAD3_96, redQUAD4_96]
     accuracy_reports = []
-    for FAM, RED, MAP in zip(quadrants384_to_96(FAMdf_384_filtered),
-                         quadrants384_to_96(REDdf_384_filtered),
+
+    for FAM, RED, MAP in zip([sarsQUAD1_96, sarsQUAD2_96, sarsQUAD3_96, sarsQUAD4_96],
+                        [redQUAD1_96, redQUAD2_96, redQUAD3_96, redQUAD4_96],
                     [accuracyMap_Quad1, accuracyMap_Quad2, accuracyMap_Quad3, accuracyMap_Quad4]):
 
         accuracy_reports.append(formatAccuracyReport(mapAcc = MAP, FAMdf = FAM, REDdf = RED).fillna('N/A'))
@@ -290,7 +295,10 @@ def accuracyValidationMethod_384(accuracyMap_Quad1,
                                                          len(accuracy_reports['Specimen Number']), dtype=int)
         accuracy_reports = pd.concat([accuracy_reports_controls, accuracy_reports])
 
-    return FAMdf_384_filtered, REDdf_384_filtered, accuracy_reports
+        return FAMdf_384_filtered, REDdf_384_filtered, accuracy_reports
+
+    else:
+        return sarsdf, REDdf, accuracy_reports
 
 def accuracyEvaluationSummary(df):
     control_filter = (df["Specimen Number"] == "Control")

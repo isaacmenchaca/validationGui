@@ -1,4 +1,4 @@
-import eel, json
+import eel, json, os
 import tkinter as tk
 from tkinter import filedialog
 import numpy as np
@@ -39,7 +39,7 @@ def popUpSaveNotSplit(outputDf, mapAcc = None, accuracy = False, input384 = Fals
             return filePath, mapAcc
     return filePath
 
-def popUpSaveSplit(outputDf):
+def popUpSaveSplit(outputDf, mapAcc = None, accuracy = False): # accuracy spits out output in four
     root = tk.Tk()
     root.attributes('-topmost', 1)
     root.withdraw()
@@ -47,8 +47,12 @@ def popUpSaveSplit(outputDf):
     root.destroy()
 
     if filePath:
+        os.remove(filePath.name)
         for i, out in enumerate(outputDf):
             out.to_excel(filePath.name[:-5] + "_Quadrant" + str(i + 1) + ".xlsx")
+        if accuracy == True:
+            for i, map in enumerate(mapAcc):
+                map.to_excel(filePath.name[:-5] +'_AccuracyMapQuad' + str(i + 1) + '.xlsx')
     return filePath
 
 
@@ -85,8 +89,19 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
                     mapAcc384.append(javascriptAccuracyMap2Dataframe(np.resize(np.array(inputInfo), [12, 8]).T))
                 SARSdf, calReddf, outputDf = accuracyValidationMethod_384(mapAcc384[0], mapAcc384[1], mapAcc384[2], mapAcc384[3],\
                                                 file = filePath, format_384  = False)
-                # outputDf <-- 4 data frames
-                return 1
+                outputString = []
+                platePassed = []
+
+                for sars, cal, out in zip(SARSdf, calReddf, outputDf):
+                    output, plate = accuracyEvaluationSummary(out)
+                    outputString.append(output)
+                    platePassed.append(plate)
+
+                popUpSaveSplit(outputDf, mapAcc = mapAcc384, accuracy = True) # check this part out
+                return SARSdf[0].to_json(), SARSdf[1].to_json(), SARSdf[2].to_json(), SARSdf[3].to_json(), \
+                        calReddf[0].to_json(), calReddf[1].to_json(), calReddf[2].to_json(), calReddf[3].to_json(), \
+                         outputString[0], outputString[1], outputString[2], outputString[3],\
+                          platePassed[0], platePassed[1], platePassed[2], platePassed[3]
 
 # -->>>>>>>>>>>>>>
     elif textValidationType == 'Uniformity':

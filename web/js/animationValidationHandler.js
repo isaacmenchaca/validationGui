@@ -347,7 +347,7 @@ async function compareMapButton(){
 }
 // ##############################################################################
 
-async function compareMapButton384(){
+async function compareMapButton384(quadrantSplit){ ////
   let grid = ["#inGridSvg1", "#inGridSvg2", "#inGridSvg3", "#inGridSvg4"]
   let plateMapColorArray384 = new Array(4);
   let passData = true
@@ -406,19 +406,30 @@ async function compareMapButton384(){
   if (passData == true) {
     // pass 384 data with eel.
     console.log(plateMapColorArray384)
-    let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath, plateMapColorArray384)();
-    let sarsDfasObj = JSON.parse(dataFromPython[0]);
-    let calRedDfasObj = JSON.parse(dataFromPython[1]);
-    let outputAccuracySummaryString = dataFromPython[2]
-    let platePassed = dataFromPython[3]
+    if (quadrantSplit = false) {
+      let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath, plateMapColorArray384)();
+      let sarsDfasObj = JSON.parse(dataFromPython[0]);
+      let calRedDfasObj = JSON.parse(dataFromPython[1]);
+      let outputAccuracySummaryString = dataFromPython[2]
+      let platePassed = dataFromPython[3]
 
-    if (!jQuery.isEmptyObject(sarsDfasObj)){
-      makeOutputHeatMap384(sarsDfasObj, ".sarsDivPlacement", "heatMapGrid", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
-    }
-    if (!jQuery.isEmptyObject(calRedDfasObj)){
-      makeOutputHeatMap384(calRedDfasObj, ".calRedDivPlacement", "heatMapGrid2", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
-    }
-  $('#inputMapModal').modal("hide")
+      if (!jQuery.isEmptyObject(sarsDfasObj)){
+        makeOutputHeatMap384(sarsDfasObj, ".sarsDivPlacement", "heatMapGrid", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
+      }
+      if (!jQuery.isEmptyObject(calRedDfasObj)){
+        makeOutputHeatMap384(calRedDfasObj, ".calRedDivPlacement", "heatMapGrid2", outputAccuracySummaryString, platePassed) // input .sarsDivPlacement,heatMapGrid
+      }
+   }
+   else {
+     let dataFromPython = await eel.getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath, plateMapColorArray384)();
+     let sarsDfasObjQuads = [JSON.parse(dataFromPython[0]), JSON.parse(dataFromPython[1]), JSON.parse(dataFromPython[2]), JSON.parse(dataFromPython[3])]
+     let calRedDfasObjQuads = [JSON.parse(dataFromPython[4]), JSON.parse(dataFromPython[5]), JSON.parse(dataFromPython[6]), JSON.parse(dataFromPython[7])]
+     let outputAccuracySummaryString = [dataFromPython[8], dataFromPython[9], dataFromPython[10], dataFromPython[11]]
+     let platePassed = [dataFromPython[12], dataFromPython[13], dataFromPython[14], dataFromPython[15]]
+
+     addPageNav2HeatMapCarousel(sarsDfasObjQuads, calRedDfasObjQuads, outputAccuracySummaryString, platePassed)
+   }
+    $('#inputMapModal').modal("hide")
   }
 
 }
@@ -793,7 +804,15 @@ async function onClickGoButton(){
       $('.pageNavQuads').empty()
       $('#inputMapModal').modal("show")
       initialPlateMap384()
-      $('#plateMapSubmit').click(function(){compareMapButton384()})
+      $('#plateMapSubmit').click(function(){compareMapButton384(false)})
+    }
+
+    else if (textValidationType == "Accuracy" && textPlateType == 384 && textQuadrantSplitType == "Yes"){
+      $('#plateMapSubmit').unbind('click');
+      $('.pageNavQuads').empty()
+      $('#inputMapModal').modal("show")
+      initialPlateMap384()
+      $('#plateMapSubmit').click(function(){compareMapButton384(true)}) // do something here// do something here
     }
 
     else if (textValidationType == "Uniformity" && textPlateType == 96){ // UNIFORMITY 96
