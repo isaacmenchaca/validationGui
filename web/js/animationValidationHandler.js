@@ -524,8 +524,10 @@ function makeOutputHeatMap(sarsDfasObj, divPlacement, heatMapID, outputAccuracyS
                       .attr("height", y.bandwidth())
                       .attr("style", "stroke:black;stroke-width:2")
                       .style("fill", function(d) {
-                        if (d[columnCount][rows[rowCount]] >= 40) {
-                          return heatColor(null)
+                        // if (d[columnCount][rows[rowCount]] >= 40) {
+                        if (d[columnCount][rows[rowCount]] >= 40 || d[columnCount][rows[rowCount]] == null) {
+                          // return heatColor(null)
+                          return "white"
                         } else {
                           return heatColor(d[columnCount][rows[rowCount]])
                         }

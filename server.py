@@ -59,11 +59,8 @@ def popUpSaveSplit(outputDf, mapAcc = None, accuracy = False): # accuracy spits 
 # ------------------------------------------------------------------------------
 @eel.expose
 def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType, filePath, inputInfo = None):
-    print(textValidationType, textPlateType, textQuadrantSplitType, filePath)
-
     if textValidationType == 'Accuracy':
         if textPlateType == 96:
-            print('FIXME: Run python Accuracy 96 method')
             mapAcc = javascriptAccuracyMap2Dataframe(np.resize(np.array(inputInfo), [12, 8]).T)
             SARSdf, calReddf, outputDf = accuracyValidationMethod_96(mapAcc, file = filePath)
             outputString, platePassed = accuracyEvaluationSummary(outputDf)
@@ -83,7 +80,6 @@ def getValidationInputs(textValidationType, textPlateType, textQuadrantSplitType
                 return SARSdf.to_json(), calReddf.to_json(), outputString, platePassed
 
             elif textQuadrantSplitType == "Yes":
-                print('FIXME: Run python Accuracy 384 method with Quadrants split')
                 mapAcc384 = []
                 for input in inputInfo:
                     mapAcc384.append(javascriptAccuracyMap2Dataframe(np.resize(np.array(inputInfo), [12, 8]).T))

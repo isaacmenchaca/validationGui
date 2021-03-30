@@ -145,11 +145,11 @@ def checkerBoardEvaluation96Helper(SARSdf, calReddf):
         for colCase2 in np.arange(0, 12, 2):
             if (rowCase2 == 0 or rowCase2 == 2) and colCase2 == 0:
                 if (np.isnan(calReddf.values[rowCase2, colCase2])):
-                    print('Controls Failed.')
+                    #print('Controls Failed.')
                     controlsPassed = False
 
                 if (np.isnan(SARSdf.values[rowCase2, colCase2])) or (SARSdf.values[rowCase2, colCase2] >= 40):
-                    print('Controls Failed.')
+                    #print('Controls Failed.')
                     controlsPassed = False
 
             if np.isnan(SARSdf.values[rowCase2, colCase2]) or SARSdf.values[rowCase2, colCase2] >= 40:
@@ -174,7 +174,7 @@ def checkerBoardEvaluation96Helper(SARSdf, calReddf):
 
 #####3
 def checkerBoardEvaluation384Helper(SARSdf, calReddf):
-    print("This will call 96 helper four times.")
+    #print("This will call 96 helper four times.")
     sarsQUAD1_96, sarsQUAD2_96, sarsQUAD3_96, sarsQUAD4_96 = quadrants384_to_96(SARSdf)
     calQUAD1_96, calQUAD2_96, calQUAD3_96, calQUAD4_96 = quadrants384_to_96(calReddf)
 
