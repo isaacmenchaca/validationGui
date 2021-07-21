@@ -1,0 +1,394 @@
+body {
+	margin: 0;
+}
+
+/* Sky */
+.sky {
+	height: 100vh;
+	background: -webkit-linear-gradient(15deg, #1A273A, #323A4D, #1A273A);
+	background: linear-gradient( 75deg, #1A273A, #323A4D, #1A273A);
+}
+/* Stars container */
+.starts {
+	width: 100%;
+	height: 100vh;
+	position: relative;
+	overflow: hidden;
+}
+
+
+
+/*=== Small stars ======*/
+.small-stars {
+	width: 100%;
+	height: 100vh;
+	position: absolute;
+	left: 0;
+	top: 0;
+	-webkit-transform: rotate(5deg);
+	    -ms-transform: rotate(5deg);
+	        transform: rotate(5deg);
+	-webkit-animation: rotation 15s infinite;
+	        animation: rotation 15s infinite;
+}
+.small-stars .star {
+	display: inline-block;
+	width: 2px;
+	height: 2px;
+	margin: 5%;
+	border: 1px solid white;
+	border-radius: 50%;
+	box-shadow: 0 0 15px white;
+	opacity: .5;
+	filter: alpha(opacity=50);
+	-webkit-animation: blink 15s infinite;
+	        animation: blink 15s infinite;
+}
+.small-stars .star i {
+	display: block;
+	width: 1px;
+	height: 1px;
+	border: 1px solid white;
+	border-radius: 5px 2px;
+	background: white;
+}
+
+/* Medium starts */
+.medium-stars {
+	width: 100%;
+	height: 100vh;
+	position: absolute;
+	left: 0;
+	top: 0;
+	-webkit-transform: rotate(-5deg);
+	    -ms-transform: rotate(-5deg);
+	        transform: rotate(-5deg);
+}
+.medium-stars .star {
+	display: inline-block;
+	width: 5px;
+	height: 5px;
+	margin: 10% 10%;
+	border: 1px solid white;
+	border-radius: 50%;
+	box-shadow: 0 0 25px white;
+}
+.medium-stars .star i {
+	display: block;
+	width: 3px;
+	height: 3px;
+	border: 1px solid white;
+	border-radius: 5px 2px;
+	background: white;
+}
+
+/* Big stars with tails */
+.big-stars {
+	width: 100%;
+	height: 100vh;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+.big-stars .star {
+	display: inline-block;
+	border-radius: 50%;
+	background: transparent;
+}
+.big-stars .star i {
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border-top: 5px solid #FFF;
+	border-left: 8px solid transparent;
+	border-right: 8px solid transparent;
+	box-shadow: 0 0 300px white;
+	position: relative;
+}
+.big-stars .star i:before {
+	display: inline-block;
+	content: "";
+	width: 0;
+	height: 0;
+	border-right: 5px solid #FFF;
+	border-top: 8px solid transparent;
+	border-bottom: 8px solid transparent;
+	-webkit-transform: rotate(-20deg);
+	    -ms-transform: rotate(-20deg);
+	        transform: rotate(-20deg);
+	box-shadow: 0 0 100px white;
+	position: absolute;
+	left: -3px;
+	top: -10px;
+}
+.big-stars .star i:after {
+	display: inline-block;
+	content: "";
+	width: 0;
+	height: 0;
+	border-left: 5px solid #FFF;
+	border-top: 8px solid transparent;
+	border-bottom: 8px solid transparent;
+	-webkit-transform: rotate(20deg);
+	    -ms-transform: rotate(20deg);
+	        transform: rotate(20deg);
+	box-shadow: 0 0 100px white;
+	position: absolute;
+	left: -3px;
+	top: -10px;
+}
+/* Style for particular stars */
+.big-stars #star1 i {
+	position: absolute;
+	left: 100px;
+	top: 100px;
+}
+.big-stars #star2 i {
+	position: absolute;
+	left: 15%;
+	top: 50%;
+	-webkit-animation: starfall 15s infinite;
+	        animation: starfall 15s infinite;
+}
+.big-stars #star3 i {
+	position: absolute;
+	left: 50%;
+	top: 60%;
+}
+.big-stars #star4 i {
+	position: absolute;
+	left: 45%;
+	top: 20%;
+}
+.big-stars #star5 i {
+	position: absolute;
+	right: 100px;
+	bottom: 100px;
+}
+
+
+/* Animation Logo */
+#logodiv {
+padding-top: 25px;
+}
+
+#textlogodiv {
+padding-top: 5px;
+}
+
+#logopicanimation {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+  animation-delay: 1s;
+  width: 100px;
+  height: 100px;
+
+}
+
+#companyLabel {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+  animation-delay: 1s;
+  width: 100px;
+  height: 20px;
+}
+
+.custom-file-input{
+	border: 1px solid black;
+	border-radius: 5px;
+}
+
+.fileTextBox{
+	border: 2px solid black;
+	color: black;
+  margin-left: 1px;
+  border-radius: 2px;
+  height: 34px;
+	width: 250px;
+}
+
+#inputMapModal .modal-dialog{
+	max-width: 65%;
+}
+
+.axis {
+	font: 15px sans-serif;
+}
+
+
+.hud {
+    animation-name: hud;
+    animation-duration: 1500ms;
+    animation-timing-function: cubic-bezier(0.24, 0.86, 0.59, 0.99);
+    animation-fill-mode: forwards;
+    margin: 20px auto auto auto;
+    position: relative;
+    background-image: url('../img/background.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+}
+
+#heatMapSvg {
+	display: block;
+	margin: auto;
+}
+
+#inGridSvg {
+	display: block;
+	margin: auto;
+}
+
+#inGridSvg1, #inGridSvg2, #inGridSvg3, #inGridSvg4 {
+	display: block;
+	margin: auto;
+}
+
+#MapCarouselIndicators{
+	height: 350px;
+}
+
+.icon384map.carousel-control-prev{
+	left: 0;
+	padding-right: 5%;
+	width: auto;
+}
+.icon384map.carousel-control-prev-icon{
+	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='ffff'%3e%3cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3e%3c/svg%3e");
+
+}
+.icon384map.carousel-control-next{
+	right: 0;
+	padding-left: 5%;
+	width: auto;
+}
+.icon384map.carousel-control-next-icon{
+	background-image:	url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='ffff'%3e%3cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+
+/*============ Animations ============*/
+@-webkit-keyframes blink {
+	from {
+		box-shadow: 0 0 15px white;
+	}
+	to {
+		box-shadow: 0 0 50px white;
+	}
+}
+@keyframes blink {
+	from {
+		box-shadow: 0 0 15px white;
+	}
+	to {
+		box-shadow: 0 0 50px white;
+	}
+}
+@-webkit-keyframes melting {
+	from {
+		background: rgba(255,255,255,1);
+		opacity: 1;
+		filter: alpha(opacity=100);
+	}
+	to {
+		background: rgba(255,255,255,0);
+		opacity: 0;
+		filter: alpha(opacity=0);
+	}
+}
+@keyframes melting {
+	from {
+		background: rgba(255,255,255,1);
+		opacity: 1;
+		filter: alpha(opacity=100);
+	}
+	to {
+		background: rgba(255,255,255,0);
+		opacity: 0;
+		filter: alpha(opacity=0);
+	}
+}
+@-webkit-keyframes rotation {
+	from {
+		-webkit-transform: rotate(5deg);
+		        transform: rotate(5deg);
+	}
+	to {
+		-webkit-transform: rotate(15deg);
+		        transform: rotate(15deg);
+	}
+}
+@keyframes rotation {
+	from {
+		-webkit-transform: rotate(5deg);
+		        transform: rotate(5deg);
+	}
+	to {
+		-webkit-transform: rotate(15deg);
+		        transform: rotate(15deg);
+	}
+}
+@-webkit-keyframes starfall {
+	0% {
+		left: 15%;
+		top: 50%;
+	}
+	67% {
+		left: 15%;
+		top: 50%;
+	}
+	80% {
+		left: 50%;
+		top: 150%;
+	}
+	100% {
+		left: 50%;
+		top: 150%;
+	}
+}
+@keyframes starfall {
+	0% {
+		left: 15%;
+		top: 50%;
+	}
+	67% {
+		left: 15%;
+		top: 50%;
+	}
+	80% {
+		left: 50%;
+		top: 150%;
+	}
+	100% {
+		left: 50%;
+		top: 150%;
+	}
+}
+
+@keyframes hud {
+    0% {
+        height: 1px;
+        top: 50px;
+        width: 1px;
+    }
+    50% {
+        height: 1px;
+        top: 50px;
+        width: 75%;
+    }
+    53% {
+        height: 1px;
+        top: 50px;
+        width: 75%;
+    }
+    100% {
+        /* height: 700px;  */
+        height: 630px;
+        top: 5px;
+        width: 80%;
+    }
+}
